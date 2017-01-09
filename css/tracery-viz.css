@@ -1,0 +1,48 @@
+.tracery-node {
+	display: inline-block;
+	padding: 3px;
+	background-color: hsla(15, 90%, 95%, .7);
+	box-shadow: 1px 2px 3px rgba(0, 0, 0, .3);
+	border-radius: 2px;
+}
+
+
+.tracery-rule {
+	color: rgba(0, 0, 0, .3);
+		display: inline-block;
+	padding: 2px 4px;
+	background-color: hsla(15, 90%, 95%, .7);
+	box-shadow: 1px 2px 3px rgba(0, 0, 0, .3);
+	border-radius: 10px;
+}
+.tracery-symbol {
+	color: rgba(0, 0, 0, .3);
+		display: inline-block;
+	padding: 4px 8px;
+	background-color: hsla(225, 90%, 95%, .7);
+	box-shadow: 1px 2px 3px rgba(0, 0, 0, .4);
+	border-radius: 10px;
+}
+
+
+.tracery-rule.selected {
+
+	background-color: hsla(185, 90%, 75%, .7);
+	color: hsla(185, 60%, 35%, .7);
+	
+}
+
+.tracery-node0 {
+
+}
+
+.tracery-node1 {
+	background-color: hsla(185, 90%, 85%, 1);
+	
+}
+
+
+.tracery-node2 {
+	background-color: hsla(325, 90%, 85%, 1);
+	
+}
