@@ -89,6 +89,14 @@ var tracery = (function() {
 
 	};
 
+
+	TraceryGrammar.prototype.flatten = function(rule) {
+
+		var node = parseRule(rule, true);
+		this.expandNode(node);
+		return node.finished;
+	};
+
 	// Expand a node
 	TraceryGrammar.prototype.expandNode = function(node, parent, state) {
 		var grammar = this;
@@ -415,7 +423,13 @@ var tracery = (function() {
 
 								break;
 
-								case "number":
+							case "tag":
+								node.finishedSections.push(section.finished);
+
+
+								break;
+
+							case "number":
 								node.finishedSections.push(section.finished);
 
 								break;
@@ -443,8 +457,19 @@ var tracery = (function() {
 					// Do the joining thing, if a custom one
 					if (grammar.joinRuleSections !== undefined)
 						node.finished = grammar.joinRuleSections(node.finishedSections);
-					else
+					else {
 						node.finished = node.finishedSections.join("");
+
+					}
+
+					node.tags = [];
+					for (var i = 0; i < node.sections.length; i++) {
+						var tags = node.sections[i].tags;
+
+						if (tags) {
+							node.tags = node.tags.concat(tags);
+						}
+					}
 
 					// Clear escape chars
 					var escaped = false;
@@ -489,6 +514,7 @@ var tracery = (function() {
 
 							this.expandNode(node.rule, node, state);
 							node.innerFinished = node.rule.finished;
+							node.tags = node.rule.tags;
 						}
 
 
@@ -546,6 +572,24 @@ var tracery = (function() {
 				break;
 			case "text":
 				// Do nothing
+				node.raw = node.finished;
+
+				// Scrape tags 
+				if (grammar.openTag) {
+
+					var s = node.finished.split(grammar.openTag);
+					var tags = [];
+					var text = s[0];
+					for (var i = 1; i < s.length; i++) {
+						var index = s[i].indexOf(grammar.closeTag);
+						var tag = s[i].substring(0, index);
+						tags.push(tag);
+
+						text += s[i].substring(index + grammar.closeTag.length);
+					}
+					node.tags = tags;
+					node.finished = text;
+				}
 				break;
 
 
@@ -587,7 +631,7 @@ var tracery = (function() {
 					if (node.isFunction) {
 						// Get from functions or modifiers
 						node.finishedTarget = grammar.getFunction(node.key, node.context === "modifier");
-				
+
 					} else {
 						node.finishedTarget = grammar.getActiveRuleset(node.key, node, state);
 					}
@@ -739,9 +783,9 @@ var tracery = (function() {
 
 					html: node.finished
 				}).appendTo($("#panel-preview .panel-content"));
-	
-	var html = $("<div/>", {
-class: "large",
+
+				var html = $("<div/>", {
+					class: "large",
 					text: node.raw
 				}).appendTo($("#panel-rule .panel-content"));
 

@@ -11,9 +11,9 @@ var Panel = Class.extend({
 			class: "panel",
 			id: this.id,
 		}).appendTo(holder);
-this.div.css({
-	position:"absolute"
-})
+		this.div.css({
+			position: "absolute"
+		})
 
 		this.header = $("<div/>", {
 			class: "panel-header",
