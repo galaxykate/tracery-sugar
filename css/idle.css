@@ -1,0 +1,14 @@
+.idle-stack {
+	min-height: 10px;
+display: flex;
+}
+
+.idle-stacklabel {
+	flex: 1;
+	background-color: hsla(60, 50%, 80%, 1);
+}
+
+.idle-stackcontent {
+	flex: 1;
+	background-color: hsla(260, 50%, 80%, 1);
+}
