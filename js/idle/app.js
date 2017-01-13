@@ -40,6 +40,10 @@ function generate(type, parts) {
 
 $(document).ready(function() {
 	console.log("start idle game");
+	new Panel("ideas", $("#panel-holder"));
+	new Panel("projects", $("#panel-holder"));
+	new Panel("students", $("#panel-holder"));
+	new Panel("calendar", $("#panel-holder"));
 
 
 	new Panel("output", $("#panel-holder"));
@@ -91,20 +95,13 @@ $(document).ready(function() {
 		}
 		updateView();
 	});
-
-	world = new World();
-	grammar = tracery.createGrammar({
-		approach: ["genetic algorithm<ga>", "evolutionary algorithm<ga>", "new approach", "framework<frameworks>"],
-		problem: ["optimization", "player modelling", "difficulty adjustment"],
-		genre: ["slot machines<gambling>", "MMOs<game><mmo>", "first person shooters<fps>", "quest structure<rpg>"],
-		idea: ["#approach# for #problem# in #genre#"],
-		lastName: ["Wang", "Li", "Harris", "Yonge", "Green", "Lopez", "Walker", "Nelson", "de la Cruz", "Tan", "Kaya", "Hughes", "Dewan", "Devi", "Dehan", "Suzuki", "Kim", "Cho", "Yoon", "Coleman", "Bryant", "Hernandez", "Perry", "Powell", "Schwartz", "Mcbride", "Malhotra", "Sai", "Pai", "Patel", "Ahmed", "Padilla", "Sloan", "Roth", "Key", "Howe", "Sosa", "Rocha"],
-		firstName: ["Judy", "Andre", "Alain", "Rafael", "Isabelle", "KayShun, Takumi", "Mehmet", "Misaki", "Aoi", "Fatma", "Emma", "Lukas", "Veeti", "Robin", "Jan", "João", "Sara", "Tanya", "Vanya", "Shay", "Keya", "Kiara", "Hiran", "Iker", "Tereza", "Lea", "Clara", "Matthew", "Michael", "Alexis", "Ana", "Madison", "Julia", "Zhang Wei", "Li Wei", "Zhang Min"],
-		student: ["#firstName#|#lastName#|#specialty#"],
-	});
+	grammar = tracery.createGrammar(rawGrammar);
 
 	grammar.openTag = "<";
 	grammar.closeTag = ">";
+
+
+	world = new World();
 
 
 	setInterval(function() {
@@ -114,6 +111,6 @@ $(document).ready(function() {
 		}
 	}, 400);
 
-	generate("idea");
+
 
 });

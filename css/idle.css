@@ -1,14 +1,70 @@
 .idle-stack {
-	min-height: 10px;
-display: flex;
-}
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	background-color: hsla(120, 50%, 30%, 1);
 
+}
+.idle-stackheader {
+	
+	display: flex;
+
+	flex-direction: row;
+	background-color: hsla(220, 50%, 50%, 1);
+
+}
 .idle-stacklabel {
-	flex: 1;
+	padding: 2px 4px;
+	
 	background-color: hsla(60, 50%, 80%, 1);
+}
+.idle-stackvalue {
+	flex: 1;
+	background-color: hsla(290, 50%, 80%, 1);
 }
 
 .idle-stackcontent {
 	flex: 1;
 	background-color: hsla(260, 50%, 80%, 1);
+}
+
+.idle-entity {
+	margin: 3px;
+	display: flex;
+	min-height: 30px;
+
+	direction: row;
+	background-color: hsla(260, 50%, 80%, 1);
+}
+
+.idle-icon {
+	overflow: hidden;
+	border-radius: 100px;
+	box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
+	width: 20px;
+	height: 20px;
+	background-color: hsla(220, 50%, 80%, 1);
+}
+.idle-content {
+	flex: 1;
+	background-color: hsla(320, 50%, 80%, 1);
+}
+.entity-flavor {
+font-style: italic;
+font-size: 10px;
+}
+.idle-action {
+	flex: 1;
+	background-color: hsla(350, 50%, 80%, 1);
+}
+
+.entity-tag {
+	margin: 2px;
+	display: inline-block;
+	overflow: hidden;
+	border-radius: 100px;
+	box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
+	padding: 2px 4px;
+	font-size: 12px;
+	background-color: hsla(220, 50%, 80%, 1);
 }

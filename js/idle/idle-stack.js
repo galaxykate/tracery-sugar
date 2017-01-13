@@ -7,25 +7,59 @@ var World = Class.extend({
 
 		this.createStack("ideas", {
 			type: "idea",
+			generator: Idea,
+			holder: $("#panel-ideas .panel-content")
 		});
-		this.createStack("students", {
-			type: "student"
+		this.createStack("researchers", {
+			type: "researcher",
+			generator: Researcher,
+			holder: $("#panel-students .panel-content")
 		});
+
+		this.stacks.researchers.add(5);
+		this.stacks.researchers.add(5);
+		this.stacks.researchers.add(5);
+		this.stacks.researchers.add(5);
+		this.stacks.researchers.add(5);
+		this.stacks.researchers.add(5);
+		this.stacks.researchers.add(5);
+		this.stacks.researchers.add(5);
+		this.stacks.ideas.add(5);
+		this.stacks.ideas.add(5);
+		this.stacks.ideas.add(5);
+		this.stacks.ideas.add(5);
+		this.stacks.ideas.add(5);
+		this.stacks.ideas.add(5);
+		this.stacks.ideas.add(5);
+		this.stacks.ideas.add(5);
+		this.stacks.ideas.add(5);
+
 	},
 
+
 	tick: function() {
-		if (Math.random() > .8) {
-			this.stacks.students.add(1);
-		}
-		if (Math.random() > .8) {
-			this.stacks.ideas.add(1);
-		}
+
+		$.each(this.stacks.students, function(index, student) {
+			student.tick();
+		});
+
+		$.each(this.stacks.projects, function(index, project) {
+			project.tick();
+		});
+
+
+
+		// For each student, add work to a research project
+
+		// Promote idea to research projects
+
+		// Promote project to paper
 
 	},
 
 	createStack: function(key, settings) {
 		this.stacks[key] = new Stack(key, settings);
-		this.stacks[key].createView(this.stackHolder);
+		this.stacks[key].createView();
 	},
 
 	updateView: function() {
@@ -41,14 +75,25 @@ var Stack = Class.extend({
 		this.key = key;
 		this.needsUpdate = true;
 		this.count = 0;
-		this.type = settings.type;
-
+		$.extend(this, settings);
 		this.content = [];
+		console.log(settings);
 	},
 
-	add: function(count) {
-		this.count += count;
+
+
+	generate: function(level) {
+		var s = new this.generator(level);
+		return s;
 	},
+
+	add: function(s) {
+		if (!isNaN(s))
+			s = this.generate(s);
+		this.content.push(s);
+		s.createView(this.contentDiv);
+	},
+
 
 	updateView: function() {
 		this.totalDiv.html(this.count);
@@ -64,29 +109,73 @@ var Stack = Class.extend({
 
 	},
 
-	createView: function(holder) {
+	createView: function() {
 		this.div = $("<div/>", {
 			class: "idle-stack"
 
-		}).appendTo(holder);
-		this.labelDiv = $("<div/>", {
-			html: this.key,
-			class: "idle-stacklabel"
+		}).appendTo(this.holder);
+
+		this.headerDiv = $("<div/>", {
+			class: "idle-stackheader"
 		}).appendTo(this.div);
+
+		this.labelDiv = $("<div/>", {
+			class: "idle-stacklabel",
+			html: this.key,
+
+		}).appendTo(this.headerDiv);
+
+		this.valueDiv = $("<div/>", {
+			class: "idle-stackvalue"
+		}).appendTo(this.headerDiv);
+
+
 
 		this.contentDiv = $("<div/>", {
 			class: "idle-stackcontent"
 
 		}).appendTo(this.div);
-
-		this.totalDiv = $("<div/>", {
-			class: "idle-stacktotal"
-
-		}).appendTo(this.contentDiv);
-
-		this.inspectorDiv = $("<div/>", {
-			class: "idle-stackinspector"
-
-		}).appendTo(this.contentDiv);
 	}
-})
+});
+
+
+var entityCount = 0;
+var Entity = Class.extend({
+
+	init: function(type) {
+		this.id = entityCount++;
+		this.type = type;
+		this.key = type + this.id;
+
+	},
+
+	createView: function(holder) {
+
+		this.div = $("<div/>", {
+			class: "idle-entity entity-" + this.type + this.id
+
+		}).appendTo(holder);
+
+		this.contentDiv = $("<div/>", {
+			class: "idle-content",
+
+		}).appendTo(this.div);
+		this.iconDiv = $("<div/>", {
+			class: "idle-icon"
+
+		}).appendTo(this.div);
+		this.actionDiv = $("<div/>", {
+			class: "idle-action"
+
+		}).appendTo(this.div);
+
+
+
+		this.fillView();
+	},
+
+	fillView: function() {
+		this.contentDiv.html(this.key);
+	}
+
+});
