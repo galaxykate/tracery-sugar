@@ -5,6 +5,26 @@
 //								/names/english/victorian/female
 
 
+//http://jsfromhell.com/array/shuffle
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length; i; i--) {
+        j = Math.floor(Math.random() * i);
+        x = a[i - 1];
+        a[i - 1] = a[j];
+        a[j] = x;
+    }
+}
+
+function toCamelCase(str) {
+
+	str = str.replace(/[.,'"-:;?]/g, "");
+	return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
+		if (+match === 0) return "";
+		return index == 0 ? match.toLowerCase() : match.toUpperCase();
+	});
+}
+
 
 function parseAction(s) {
 	s = s.trim();

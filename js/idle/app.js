@@ -1,4 +1,4 @@
-var paused = true;
+var paused = false;
 var time = {
 	current: 0,
 	elapsed: .1,
@@ -11,7 +11,7 @@ var grammar;
 var world;
 
 function tick() {
-	console.log("tick " + time.step);
+	//console.log("tick " + time.step);
 	time.step += 1;
 	output("step: " + time.step);
 	world.tick();
@@ -25,7 +25,7 @@ function output(s) {
 }
 
 function updateView() {
-	console.log("update view");
+
 	world.updateView();
 }
 
@@ -42,7 +42,7 @@ $(document).ready(function() {
 	console.log("start idle game");
 	new Panel("ideas", $("#panel-holder"));
 	new Panel("projects", $("#panel-holder"));
-	new Panel("students", $("#panel-holder"));
+	new Panel("researchers", $("#panel-holder"));
 	new Panel("calendar", $("#panel-holder"));
 
 
@@ -95,8 +95,35 @@ $(document).ready(function() {
 		}
 		updateView();
 	});
-	grammar = tracery.createGrammar(rawGrammar);
+	grammar = tracery.createGrammar(rawGrammar, true);
+	grammar.modifiers.acronym = function(s) {
+		if (s.length < 5)
+			return s;
 
+		var s2 = s.split(" ");
+
+		var s3 = s2.map(function(s4) {
+			var ignore = ["in an on the with of"];
+			if (ignore.indexOf(s4) >= 0)
+				return "";
+			var prefixes = "tree graph char gen nav map dev sys int soc rel RPG MMO topo land".split(" ");
+			for (var i = 0; i < prefixes.length; i++) {
+
+			}
+
+			var s5 = s4.charAt(0).toUpperCase();
+			if (Math.random() > .6) {
+
+				s5 += s4.charAt(1);
+				if (Math.random() > .6)
+					s5 += s4.charAt(2);
+			}
+
+			return s5;
+		}).join("");
+		
+		return s3;
+	}
 	grammar.openTag = "<";
 	grammar.closeTag = ">";
 

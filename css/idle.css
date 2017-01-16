@@ -1,8 +1,13 @@
+@font-face {
+    font-family: "whiteboard";
+    src: url(Folsom Prison.ttf);
+}
+
 .idle-stack {
-	height: 100%;
+	
 	display: flex;
 	flex-direction: column;
-	background-color: hsla(120, 50%, 30%, 1);
+	max-height: 33%;
 
 }
 .idle-stackheader {
@@ -10,55 +15,132 @@
 	display: flex;
 
 	flex-direction: row;
-	background-color: hsla(220, 50%, 50%, 1);
-
 }
 .idle-stacklabel {
 	padding: 2px 4px;
-	
-	background-color: hsla(60, 50%, 80%, 1);
+
 }
 .idle-stackvalue {
 	flex: 1;
-	background-color: hsla(290, 50%, 80%, 1);
+
 }
 
 .idle-stackcontent {
+	overflow: scroll;
 	flex: 1;
-	background-color: hsla(260, 50%, 80%, 1);
+	background-color: white;
 }
 
+
+.entity-flavor {
+font-style: italic;
+font-size: 10px;
+}
+
+.entity-activity {
+	font-style: italic;
+font-size: 10px;
+	position: absolute;
+	right: 3px;
+	top: 3px;
+}
+.entity-info {
+
+display: inline-block;
+}
+
+
 .idle-entity {
+
+position: relative;
 	margin: 3px;
 	display: flex;
 	min-height: 30px;
 
 	direction: row;
-	background-color: hsla(260, 50%, 80%, 1);
+	background-color: hsla(260, 50%, 100%, 1);
 }
 
-.idle-icon {
+.meeple {
+		transition:transform .2s  cubic-bezier(0.250, 0.250, 0.760, 1.650), box-shadow .2s  cubic-bezier(0.250, 0.250, 0.760, 1.650);
+
+	display: inline-block;
 	overflow: hidden;
+	transform: translate(0px, 0);
 	border-radius: 100px;
 	box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
 	width: 20px;
+	margin: 3px;
 	height: 20px;
 	background-color: hsla(220, 50%, 80%, 1);
-}
-.idle-content {
-	flex: 1;
-	background-color: hsla(320, 50%, 80%, 1);
-}
-.entity-flavor {
-font-style: italic;
-font-size: 10px;
-}
-.idle-action {
-	flex: 1;
-	background-color: hsla(350, 50%, 80%, 1);
+	z-index: 300;
 }
 
-.entity-tag {
+.skill.flash {
+	transform: translate(0px, -2px);
+	box-shadow: 0px 4px 7px 2px rgba(0, 0, 0, .3);
+}
+
+.meeple.flash {
+	transform: translate(0px, -5px);
+	box-shadow: 0px 4px 7px 2px rgba(0, 0, 0, .3);
+}
+
+.dragging-meeple {
+	box-shadow: 0px 5px 5px rgba(0, 0, 0, .9);
+	
+}
+
+.idle-content {
+	position: relative;
+	flex: 1;
+
+}
+
+.idle-action {
+	position: relative;
+
+	
+}
+
+#lab {
+	text-align: center;
+}
+.socket-holder {
+
+display: inline-block;
+text-align: center;
+}
+
+.socket-label {
+font-size: 10px;
+}
+.idle-socket {
+	display: inline-block;
+	border-radius: 10px;
+	box-shadow: inset 0px 1px 1px rgba(0, 0, 0, .3);
+	background-color: hsla(350, 50%, 80%, 1);
+	min-width:  20px;
+	min-height: 20px;
+	padding: 3px;
+	margin: 2px;
+}
+
+
+.idle-socket-hover {
+	box-shadow: inset 0px 1px 1px rgba(0, 0, 0, .6);
+	background-color: hsla(350, 50%, 70%, 1);
+}
+
+.idle-socket-highlight {
+	box-shadow: inset 0px 1px 1px rgba(0, 0, 0, .6);
+	background-color: hsla(350, 50%, 50%, 1);
+}
+
+.skill {
+	transition:transform .2s  cubic-bezier(0.250, 0.250, 0.760, 1.650), box-shadow .2s  cubic-bezier(0.250, 0.250, 0.760, 1.650);
+	transform: translate(0px, 0px);
+	
 	margin: 2px;
 	display: inline-block;
 	overflow: hidden;
@@ -67,4 +149,76 @@ font-size: 10px;
 	padding: 2px 4px;
 	font-size: 12px;
 	background-color: hsla(220, 50%, 80%, 1);
+}
+.skill-focus {
+background-color: hsla(200, 50%, 80%, 1);
+}
+.skill-approach {
+background-color: hsla(170, 50%, 80%, 1);
+}
+.skill-content {
+background-color: hsla(140, 50%, 80%, 1);
+}
+.skill-meta {
+background-color: hsla(30, 50%, 80%, 1);
+}
+
+.entity-idea .idle-content{
+padding: 2px 10px;
+	font-family: 'Permanent Marker', cursive;
+	
+}
+
+.progress-holder {
+	width: 200px;
+	
+}
+
+.progress-header {
+	height: 17px;
+	background-color: hsla(200, 50%, 90%, 1);
+	}
+
+	.progress-bar {
+		position: relative;
+	height: 15px;
+	background-color: hsla(200, 50%, 80%, 1);
+	}
+
+.progress-fill {
+	top: 0px;
+	left: 0px;
+	position: absolute;
+	height: 100%;
+	width: 50%;
+	background-color: hsla(200, 50%, 50%, 1);
+	box-shadow: inset 0px -1px 5px hsla(0, 0%, 0%, 1), inset 0px 1px 5px hsla(200, 90%, 70%, 1),  3px 0px 1px hsla(200, 90%, 0%, 1);
+}
+
+.progress-bg {
+	top: 0px;
+	left: 0px;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background-color: hsla(200, 50%, 30%, 1);
+	box-shadow: inset 0px -1px 8px hsla(0, 0%, 0%, 1);
+}
+
+
+
+.progress-rate {
+	padding: 1px 2px;
+	display: inline-block;
+	font-size: 12px;
+}
+
+.progress-stats {
+	float: right;
+}
+
+.progress-value {
+	padding: 0px 2px;
+	display: inline-block;
+	font-size: 12px;
 }

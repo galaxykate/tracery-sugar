@@ -1,3 +1,71 @@
+
+var ProgressBar = Class.extend({
+	init: function(holder, label, max) {
+		this.stats = {
+			max: max,
+			value: max/2,
+			pct: 0,
+			rate: 0
+		}
+		this.holder = $("<div/>", {
+			class: "progress-holder"
+		}).appendTo(holder);
+
+		this.header = $("<div/>", {
+			class: "progress-header"
+		}).appendTo(this.holder);
+
+
+		this.label = $("<div/>", {
+			html: label,
+			class: "progress-label"
+		}).appendTo(this.header);
+
+		this.statHolder = $("<div/>", {
+			class: "progress-stats"
+		}).appendTo(this.header);
+
+		this.value = $("<div/>", {
+			class: "progress-value",
+		}).appendTo(this.statHolder);
+
+		this.rate = $("<div/>", {
+			class: "progress-rate",
+		}).appendTo(this.statHolder);
+
+
+		this.bar = $("<div/>", {
+			class: "progress-bar"
+		}).appendTo(this.holder);
+		this.barBG = $("<div/>", {
+			class: "progress-bg"
+		}).appendTo(this.bar);
+		this.fill = $("<div/>", {
+			class: "progress-fill"
+		}).appendTo(this.bar);
+
+		this.update(0, 0);
+
+	},
+
+	update: function(value, rate) {
+		this.stats.value = value;
+		this.stats.rate = rate;
+		this.stats.pct = this.stats.value / this.stats.max;
+		this.fill.css({
+			width: (this.stats.pct * 100) + "%"
+		});
+
+		this.rate.html("(" + this.stats.rate + "/s)");
+		this.value.html(this.stats.value + "/" + this.stats.max);
+
+	},
+
+
+
+});
+
+
 var panelCount = 0;
 var Panel = Class.extend({
 	init: function(id, holder, startPos) {

@@ -60,6 +60,10 @@ var tracery = (function() {
 
 	};
 
+	TraceryGrammar.prototype.setSymbol = function(key, rules) {
+		this.symbols[key] = new TraceryRuleset(key, rules);
+	}
+
 	TraceryGrammar.prototype.getActiveRuleset = function(key, node, state) {
 		var stack = state.stacks[key];
 		if (stack)
@@ -77,8 +81,8 @@ var tracery = (function() {
 
 	// Stomp rules
 	TraceryGrammar.prototype.setRules = function(key, rules, state) {
-
 		state.stacks[key] = [new TraceryRuleset(key, rules)];
+
 	};
 
 	TraceryGrammar.prototype.popRules = function(key, state) {
@@ -100,10 +104,21 @@ var tracery = (function() {
 	};
 
 
-	TraceryGrammar.prototype.flatten = function(rule) {
+	TraceryGrammar.prototype.flatten = function(rule, ruleOverrides) {
+		var state = {
+			stacks: {}
+		};
 
 		var node = parseRule(rule, true);
-		this.expandNode(node);
+		if (ruleOverrides) {
+			for (var key in ruleOverrides) {
+				if (ruleOverrides.hasOwnProperty(key)) {
+					this.pushRules(key, ruleOverrides[key], state);
+				}
+			}
+
+		}
+		this.expandNode(node, undefined, state);
 		return node.finished;
 	};
 
@@ -557,11 +572,12 @@ var tracery = (function() {
 							if (fxn === undefined) {
 								mod.finished += "[[." + name + "]]";
 							} else {
+								if (mod.parameters === undefined)
+									mod.parameters = [];
 								var parameters = mod.parameters.map(function(p) {
 									console.log(p);
 									return p.finished;
 								});
-								console.log(parameters);
 								node.finished = fxn.apply(undefined, [node.finished].concat(parameters));
 							}
 						}
@@ -783,8 +799,26 @@ var tracery = (function() {
 						return s2;
 					},
 
+					despace: function(s) {
+					
+						var s2 = s.replace(/[^A-Za-z0-9]+/g, "");
+						s2 = s2.replace(/\s+/g, '');
+						
+						return s2;
+					},
+					allCaps: function(s) {
+						var s2 = "";
+						var capNext = true;
+						for (var i = 0; i < s.length; i++) {
+							s2 += s.charAt(i).toUpperCase();
+						}
+						return s2;
+					},
+
 					capitalize: function(s) {
-						return s.charAt(0).toUpperCase() + s.substring(1);
+						var s2 =  s.charAt(0).toUpperCase() + s.substring(1);
+						return s2;
+						console.log(capitalize);
 					},
 
 					a: function(s) {
