@@ -104,7 +104,6 @@ function createDiagram(node, holder, classes) {
 
 
 		case "expression":
-			console.log(node);
 			if (node.expressionType === "if") {
 				createDiagram(node.trueValue, content);
 				content.append("<span class='traceryparse-minitext'> if </span>");
@@ -152,7 +151,6 @@ function createDiagram(node, holder, classes) {
 						class: "traceryparse-forloopholder"
 					}).appendTo(content);
 					$.each(node.loops, function(index, loopParams) {
-						console.log(loopParams);
 						var div = $("<div>", {
 							class: "traceryparse-forloop"
 						}).appendTo(forLoopHolder);
@@ -264,7 +262,7 @@ function createDiagram(node, holder, classes) {
 
 
 		case "path":
-			
+
 			subNodes = node.path.slice(0);
 			break;
 
@@ -308,6 +306,12 @@ function createDiagram(node, holder, classes) {
 	}
 
 
+	if (node.errors && node.errors.length > 0) {
+		var errors = $("<div/>", {
+			html: node.errors.concat("<br>"),
+			class: "traceryparse-errors",
+		}).appendTo(content);
+	}
 
 
 

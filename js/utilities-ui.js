@@ -1,9 +1,8 @@
-
 var ProgressBar = Class.extend({
 	init: function(holder, label, max) {
 		this.stats = {
 			max: max,
-			value: max/2,
+			value: max / 2,
 			pct: 0,
 			rate: 0
 		}
@@ -65,13 +64,19 @@ var ProgressBar = Class.extend({
 
 });
 
+function resetAllPanels() {
+	for (var i = 0; i < allPanels.length; i++) {
+		allPanels[i].setPosition(i * 120, i * 10);
+	}
+}
 
+var allPanels = [];
 var panelCount = 0;
 var Panel = Class.extend({
 	init: function(id, holder, startPos) {
 		var panel = this;
 		this.idNumber = panelCount++;
-
+		allPanels.push(this);
 
 		this.id = "panel-" + id;
 

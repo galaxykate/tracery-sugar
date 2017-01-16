@@ -339,14 +339,20 @@ var tracery = (function() {
 
 						// May be a ruleset, a function (with params), or some random crap we pulled from the world object
 						if (address.isFunction) {
-
-							node.generatedRules = target.apply(null, address.finishedParameters);
+							if (!target) {
+								node.errors.push("No function " + inQuotes(address.raw));
+							} else {
+								node.generatedRules = target.apply(null, address.finishedParameters);
+							}
 						} else if (address.isSymbolKey) {
 							// Clone the rules
 							if (!target || !target.rules) {
 								console.warn("No rules found for " + address.key);
 							}
-							node.generatedRules = target.rules.slice(0);
+							if (!target || !target.rules)
+								node.generatedRules = [];
+							else
+								node.generatedRules = target.rules.slice(0);
 						} else {
 							// Crap from world object
 							node.generatedRules = target;
@@ -469,7 +475,7 @@ var tracery = (function() {
 
 								break;
 							default:
-								console.warn("unknown type", section.type);
+								//	console.warn("unknown type", section.type);
 								node.finishedSections.push(section.finished);
 
 								break
@@ -570,7 +576,9 @@ var tracery = (function() {
 								name = mod.key;
 							}
 							if (fxn === undefined) {
+								node.errors.push("No modifier " + inQuotes(name));
 								mod.finished += "[[." + name + "]]";
+							
 							} else {
 								if (mod.parameters === undefined)
 									mod.parameters = [];
@@ -666,14 +674,22 @@ var tracery = (function() {
 
 				// if this is a function, perform the function
 				if (node.isFunction) {
-					node.finishedParameters = node.parameters.map(function(param) {
-						grammar.expandNode(param, node, state);
-						return param.finished;
-					});
 
-					if (node.context !== "modifier") {
-						node.finished = node.finishedTarget.apply(null, node.finishedParameters);
+					if (node.finishedTarget !== undefined) {
 
+						// Expand out all the parameters
+						node.finishedParameters = node.parameters.map(function(param) {
+							grammar.expandNode(param, node, state);
+							return param.finished;
+						});
+
+
+						// Not a modifier?  Apply immediately (Ie, dont need to wait for an inner value to pass as a parameter)
+						if (node.context !== "modifier") {
+							node.finished = node.finishedTarget.apply(null, node.finishedParameters);
+						}
+					} else {
+						node.errors.push("No function named " + inQuotes(key));
 					}
 				} else {
 					// The target is either a ruleset, or a world value
@@ -800,10 +816,10 @@ var tracery = (function() {
 					},
 
 					despace: function(s) {
-					
+
 						var s2 = s.replace(/[^A-Za-z0-9]+/g, "");
 						s2 = s2.replace(/\s+/g, '');
-						
+
 						return s2;
 					},
 					allCaps: function(s) {
@@ -816,7 +832,7 @@ var tracery = (function() {
 					},
 
 					capitalize: function(s) {
-						var s2 =  s.charAt(0).toUpperCase() + s.substring(1);
+						var s2 = s.charAt(0).toUpperCase() + s.substring(1);
 						return s2;
 						console.log(capitalize);
 					},
@@ -894,10 +910,10 @@ var tracery = (function() {
 		//'#emoji##name#' for a in /emojiTable [emoji:a/emoji][name:a/name] ''
 		//"'#myNum##animal#' for myNum in number", "'#myNum##myAnimal#' for myNum in number for myAnimal in animal",
 		tests: {
-			//rule: ["foo", "\\\\\\foo", "foo#bar#", "#animalName.capitalize.s#", "foo#missingSymbol#", "foo[bar]", "foo[#bar#]","[#animalName.replace([vowel],'X')#]", "[range(0,4,5)]", "[join([range(0,4,5)],',')]", "[doSomethingWithNoReturn(#foo#)]", "foo\\#bar\\#", "\\[foo{#'\\]", "(#foo#)", "!صَبَاحُ الخَيْر", "בוקר טוב.", "早上好", "I 💖 emoji🏄🏾"],
+			rule: ["foo", "\\\\\\foo", "foo#bar#", "#animalName.capitalize.s#", "foo#missingSymbol#", "foo[bar]", "foo[#bar#]", "[#animalName.replace([vowel],'X')#]", "[range(0,4,5)]", "[join([range(0,4,5)],',')]", "[doSomethingWithNoReturn(#foo#)]", "foo\\#bar\\#", "\\[foo{#'\\]", "(#foo#)", "!صَبَاحُ الخَيْر", "בוקר טוב.", "早上好", "I 💖 emoji🏄🏾"],
 			//rule: ["#animalName.replace([vowel],'X')#"],
 			//rule: ["['#x# + 1' for foo in number1]"],
-			rule: ["<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'>['<circle fill=\\'hsl([(x*10 + y*50)],50%,[(y)]0%)\\' cx=\\'[ (x * #/spacing/x# + 15)  ]\\' cy=\\'[ (y * #/spacing/y# + 15)  ]\\' r=\\'[(random(10) + 3)]\\'/>' for x in number for y in number ]<svg>"],
+			//rule: ["<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'>['<circle fill=\\'hsl([(x*10 + y*50)],50%,[(y)]0%)\\' cx=\\'[ (x * #/spacing/x# + 15)  ]\\' cy=\\'[ (y * #/spacing/y# + 15)  ]\\' r=\\'[(random(10) + 3)]\\'/>' for x in number for y in number ]<svg>"],
 			//rule: ["[(random(5))]"],
 			// "['#drawFlower#' for x in number1 for y in number1]"],
 			//rule: ["#origin#"] ,

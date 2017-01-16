@@ -490,7 +490,7 @@ function parseRule(rawRule, protected) {
 	
 	// Non-string rule!
 	if (!isString(rawRule)) {
-		console.warn("non-string rule");
+		//console.warn("non-string rule");
 		rule.nonString = true;
 		return rule;
 	}

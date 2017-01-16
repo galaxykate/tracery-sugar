@@ -6,6 +6,8 @@ new Panel("expansion", $("#panel-holder"));
 new Panel("rule", $("#panel-holder"));
 new Panel("preview", $("#panel-holder"));
 
+
+
 	/*
 		var node = new TraceryNode({
 			tagContents: "[myName:#name.capitalize#][myColor:#color#][addFlag:started]origin.replace(animal,[#foo.capitalize#])[x+=1][clearFlag:started]",
@@ -27,5 +29,5 @@ new Panel("preview", $("#panel-holder"));
 
 	//var viz = new TraceryNodeViz(node, $("#panel-expansion .panel-content"))
 	tracery.test();
-	runTraceryTests();
+	
 });

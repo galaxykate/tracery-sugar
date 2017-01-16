@@ -35,7 +35,14 @@
 	background-color: hsla(240, 90%, 75%, .8);
 	border:1px solid hsla(240, 90%, 25%, .5) ;
 }
+.traceryparse-errors {
+		font-size: 12px;
 
+	border-radius: 16px;
+	margin: 3px;
+	background-color: hsla(20, 90%, 65%, .7);
+	color: hsla(0, 90%, 20%, 1);
+}
 
 
 .traceryparse-node {
