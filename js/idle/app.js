@@ -44,7 +44,7 @@ $(document).ready(function() {
 	new Panel("researchers", $("#panel-holder"));
 	//new Panel("calendar", $("#panel-holder"));
 
-
+$(".panel-header").hide();
 	var controlHolder = $("#panel-controls .panel-content");
 
 	var statsHolder = $("#panel-stats .panel-content");

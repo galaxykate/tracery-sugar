@@ -47,6 +47,7 @@
 .idle-stackcontent {
 	overflow: scroll;
 	flex: 1;
+
 	
 }
 
@@ -178,6 +179,11 @@ text-align: center;
 	border-radius: 10px;
 		background-color: hsla(150, 10%, 80%, .7);
 }
+
+#researchers {
+	
+}
+
 .socket-researching {
 max-width: 30px;
 }
