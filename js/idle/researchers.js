@@ -1,6 +1,5 @@
 function createResearcherIcon(researcher, activity, socketID) {
-	console.log("Move to " + activity + " " + socketID);
-
+	
 	//return "<div class='researcher idle-icon'><img width='100%' src='css/img/meeple.png'/><div>";
 	var div = $("<div/>", {
 		class: "meeple",
@@ -20,11 +19,9 @@ function createResearcherIcon(researcher, activity, socketID) {
 				return createResearcherIcon(researcher)
 			},
 			start: function() {
-				console.log(activity);
-
+			
 				researcher.removeAll();
 				heldResearcher = researcher;
-				console.log("Remove " + heldResearcher + " from " + activity);
 			},
 
 			stop: function() {
@@ -93,10 +90,11 @@ var Researcher = Entity.extend({
 		var researcher = this;
 
 		var metaBonus = 1;
-		metaBonus *= world.speed;
 		if (this.skills[this.activity]) {
 			metaBonus += this.skills[this.activity].bonus;
 		}
+		metaBonus *= speed;
+
 		//console.log(this.activity + "" + metaBonus);
 		switch (this.activity) {
 			case "chilling":
@@ -124,11 +122,15 @@ var Researcher = Entity.extend({
 			case "researching":
 
 				// increase metabonus with shared tags TODO
-				this.atEntity.progress += metaBonus;
-				console.log(this.atEntity);
-				if (this.atEntity.progress > this.atEntity.max) {
-					researcher.moveTo();
-				}
+				this.atEntity.gainProgress(metaBonus);
+
+				break;
+
+			case "writing":
+
+				// increase metabonus with shared tags TODO
+				this.atEntity.gainProgress(metaBonus);
+
 				break;
 		}
 	},
@@ -140,7 +142,6 @@ var Researcher = Entity.extend({
 
 		if (skill) {
 
-			console.log(skill);
 			var skillDiv = $("#" + this.key).find(".skill-" + skill.skill.key);
 			skillDiv.addClass("flash");
 			setTimeout(function() {
@@ -197,9 +198,12 @@ var Researcher = Entity.extend({
 
 	moveTo: function(activity, entity) {
 		if (!activity) {
-			console.log("reset");
 			activity = "chilling";
 			entity = this;
+		}
+
+		if (this.atEntity) {
+			this.atEntity.removeResearcher(this);
 		}
 
 		var socketID = toSocketID(activity, entity);
@@ -211,6 +215,11 @@ var Researcher = Entity.extend({
 		createResearcherIcon(this, "learning", socketID);
 		this.activity = activity;
 		this.atEntity = entity;
+
+
+		if (this.atEntity) {
+			this.atEntity.addResearcher(this, activity);
+		}
 
 		this.activityDiv.html(activity);
 	},
@@ -234,12 +243,12 @@ var Researcher = Entity.extend({
 		}).appendTo(this.infoDiv);
 
 		this.flavorDiv = $("<div/>", {
-			class: "entity-flavor",
+			class: "entity-flavor minitext",
 			html: this.flavor
 		}).appendTo(this.infoDiv);
 
 		this.activityDiv = $("<div/>", {
-			class: "entity-activity",
+			class: "entity-activity minitext",
 		}).appendTo(this.infoDiv);
 
 
@@ -248,7 +257,6 @@ var Researcher = Entity.extend({
 			class: "entity-reroll",
 			html: "🎲"
 		}).appendTo(this.actionDiv).click(function() {
-			console.log(researcher);
 			researcher.reroll();
 			researcher.refreshView();
 

@@ -1,3 +1,29 @@
+var ValueView = Class.extend({
+	init: function(holder, label, isInteger) {
+		this.isInteger = true;
+		this.holder = $("<div/>", {
+			class: "valueview-holder"
+		}).appendTo(holder);
+
+
+		this.label = $("<div/>", {
+			html: label + ": ",
+			class: "valueview-label"
+		}).appendTo(this.holder);
+
+		this.value = $("<div/>", {
+			class: "valueview-value"
+		}).appendTo(this.holder);
+	},
+
+	update: function(value) {
+		if (this.isInteger)
+			value = Math.floor(value);
+		this.value.html(value);
+		this.lastValue = value;
+	}
+});
+
 var ProgressBar = Class.extend({
 	init: function(holder, label, max) {
 		this.stats = {
@@ -73,7 +99,7 @@ function resetAllPanels() {
 var allPanels = [];
 var panelCount = 0;
 var Panel = Class.extend({
-	init: function(id, holder, startPos) {
+	init: function(id, holder, startPos, allowMovement) {
 		var panel = this;
 		this.idNumber = panelCount++;
 		allPanels.push(this);
@@ -97,33 +123,37 @@ var Panel = Class.extend({
 			class: "panel-content",
 		}).appendTo(this.div);
 
-		this.div.draggable({
-			handle: ".panel-header",
-			stop: function(ev, ui) {
-				console.log(ui);
-				panel.x = ui.position.left;
-				panel.y = ui.position.top;
-				panel.savePosition();
-			}
-		});
+		if (allowMovement) {
+			this.div.draggable({
+				handle: ".panel-header",
+				stop: function(ev, ui) {
+					console.log(ui);
+					panel.x = ui.position.left;
+					panel.y = ui.position.top;
+					panel.savePosition();
+				}
+			});
 
-		this.div.resizable({
-			stop: function() {
-				panel.w = panel.div.width();
-				panel.h = panel.div.height();
-				panel.savePosition();
-			}
-		});
 
-		var savedPos = localStorage.getItem(this.id);
-		if (savedPos)
-			startPos = JSON.parse(savedPos);
+			this.div.resizable({
+				stop: function() {
+					panel.w = panel.div.width();
+					panel.h = panel.div.height();
+					panel.savePosition();
+				}
+			});
 
+
+			var savedPos = localStorage.getItem(this.id);
+			if (savedPos)
+				startPos = JSON.parse(savedPos);
+		}
 		if (!startPos) {
-			this.setPosition(this.idNumber * 120, this.idNumber * 20);
+			//this.setPosition(this.idNumber * 120, this.idNumber * 20);
 		} else {
 			this.setPosition(startPos.x, startPos.y, startPos.w, startPos.h);
 		}
+
 	},
 
 

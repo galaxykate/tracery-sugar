@@ -2,12 +2,12 @@ function toSocketID(activity, entity) {
 	var key = "socket-" + activity;
 	if (entity)
 		key = "socket-" + activity + "-" + entity.key;
-return key;
-} 
+	return key;
+}
 
 function createSocket(holder, activity, entity, label, w, h) {
 	var socketID = toSocketID(activity, entity);
-	
+
 	var socketHolder = $("<div/>", {
 		class: "socket-holder socket-" + activity
 
@@ -104,9 +104,7 @@ var Idea = Entity.extend({
 			html: "▲"
 		}).appendTo(this.actionDiv).click(function() {
 
-			idea.nameDiv.css({
-				"text-decoration": "underline"
-			});
+
 			world.upgradeToProject(idea);
 		});
 	},
@@ -116,16 +114,182 @@ var Idea = Entity.extend({
 		return this.name;
 	}
 });
+
+
+// Quality of a paper
+// based on the completion of the project
 var Paper = Entity.extend({
-	init: function(project) {
+	init: function(project, type, completion) {
 		this._super("paper");
+		this.name = "PAPER";
+		this.paperType = type;
+		this.project = project;
+		this.set = project.set;
+		this.conferenceButtons = {};
+		this.tags = project.tags;
+		console.log("create a paper for ", project, type, completion);
+		console.log(this);
+		// Completion matters less for shorter papers than longer
+		this.quality = Math.round(completion);
+
+		this.reroll();
+	},
+
+	submitTo: function(conf) {
+		console.log("Submit this to  " + conf);
+		this.outForReview = true;
+		this.conferenceButtonHolder.hide();
+		this.sentToConference = conf;
+		this.statusDiv.html("Out for review at " + conf.name);
+		this.reviewTimer = 20;
+
+	},
+	acceptOrReject: function() {
+		var conf = this.sentToConference;
+		this.outForReview = false;
+		var accept = .04*this.quality * (1 + .3 * Math.random());
+		console.log(accept + " " + this.quality);
+		if (accept > conf.quality) {
+			this.acceptedTo = conf;
+			world.addCredit(conf, this);
+			this.statusDiv.html("Accepted to " + conf.name + "!");
+
+		} else {
+
+			this.conferenceButtonHolder.show();
+			this.statusDiv.html("Rejected from " + conf.name);
+		}
+	},
+
+	onGainProgress: function(count) {
+		//this.gainInsights(count * insightPerProgress);
+	},
+
+	updateConferenceButtons: function() {
+		var paper = this;
+		if (this.isCompleted && !this.outForReview) {
+
+			$.each(world.conferences, function(index, conf) {
+				// update or construct
+				//	console.log(conf.type, paper.paperType.name);
+
+				var match = (conf.type === "journal" && paper.paperType.name === "journal") || (conf.type !== "journal" && paper.paperType.name !== "journal");
+				if (conf.daysTill > 0 && conf.daysTill < 90 && match) {
+					// Upcoming confs
+					if (!paper.conferenceButtons[conf.key]) {
+						var s = conf.name;
+						if (conf.acronym)
+							s = conf.acronym
+
+						s = conf.stars + s;
+						paper.conferenceButtons[conf.key] = $("<button/>", {
+							html: s
+						}).appendTo(paper.conferenceButtonHolder).click(function() {
+							paper.submitTo(conf);
+						});
+					}
+				} else {
+					// Past conf
+					// remove submission button
+					if (paper.conferenceButtons[conf.key]) {
+						paper.conferenceButtons[conf.key].remove();
+						paper.conferenceButtons[conf.key] = undefined;
+					}
+				}
+
+			});
+		}
+
+		if (this.outForReview) {
+			this.reviewTimer--;
+			if (this.reviewTimer < 0) {
+				this.acceptOrReject();
+			}
+		}
+	},
+
+	onComplete: function() {
+		this.completionBar.holder.remove();
+		this.statusDiv.html("Completed");
+
+		this.updateConferenceButtons();
+	},
+
+
+	tick: function() {
+		this.checkProgress();
+		this.updateConferenceButtons();
 
 	},
 
-	tick: function() {
+	fillView: function() {
+		var paper = this;
 
-	}
+		this.typeDiv = $("<div/>", {
+			class: "minitext paper-type paper-" + this.paperType.name,
+			html: this.paperType.name
+		}).appendTo(this.infoDiv);
+
+		this.nameDiv = $("<div/>", {
+			class: "entity-name",
+			html: this.name
+		}).appendTo(this.infoDiv);
+
+
+		this.completionBar = new ProgressBar(this.statDiv, "", this.max);
+
+
+		this.statusDiv = $("<div/>", {
+			class: "status",
+		}).appendTo(this.statDiv);
+
+		this.socket = createSocket(this.socketColumn, "writing", this);
+
+		this.conferenceButtonHolder = $("<div/>", {
+			html: "submit to",
+			class: "entity-conferences minitext",
+		}).appendTo(this.actionDiv);
+
+		this.insightView = new ValueView(this.statDiv, "quality");
+		this.insightView.update(this.quality);
+
+		this.tagDiv.html("");
+		$.each(this.tags, function(key, tag) {
+			createSkillChip(paper.tagDiv, tag);
+		});
+
+		this.addButtons();
+
+	},
+
+	reroll: function() {
+		this.isCompleted = false;
+		this.outForReview = false;
+		this.progress = 0;
+		this.rate = 0;
+		console.log(this.project);
+
+		this.max = Math.round(10 + 30 * Math.pow(Math.random(), 3)) * 100;
+
+		// Fill out the set
+
+		var overrides = {
+			codeName: this.project.codeName
+		};
+		console.log(this.set);
+		for (var i = 0; i < types.length; i++) {
+
+			overrides[types[i]] = this.set[types[i]].name;
+
+		}
+
+		this.removeAllResearchers();
+		this.name = grammar.flatten("#paper#", overrides,
+			true);
+	},
 });
+
+
 
 var Project = Entity.extend({
 	init: function(idea) {
@@ -139,9 +303,11 @@ var Project = Entity.extend({
 	},
 
 	reroll: function() {
+		this.isCompleted = false;
 		this.progress = 0;
 		this.rate = 0;
-		this.max = Math.round(10 + 30*Math.pow(Math.random(), 3))*100;
+		this.insights = 0;
+		this.max = Math.round(10 + 30 * Math.pow(Math.random(), 3)) * 100;
 		this.graphOffset = Math.random() * 9999;
 
 		// Fill out the set
@@ -163,20 +329,60 @@ var Project = Entity.extend({
 
 		}
 
+		this.removeAllResearchers();
 		console.log(overrides);
 		console.log(set);
+		this.set = set;
 
+		this.codeName = grammar.flatten("#projectName#", overrides,
+			true);
 
+		overrides.codeName = this.codeName;
 		this.name = grammar.flatten("#project#", overrides,
 			true);
 
 
 	},
 
+	payInsights: function(count) {
+		this.insights -= count;
+		this.updateInsightView();
+	},
+
+	gainInsights: function(count) {
+		this.insights += count;
+		this.updateInsightView();
+	},
+
+
+	// button
+	updateInsightView: function() {
+		var insightCount = this.insights;
+		this.insightView.update(this.insights);
+		// label buttons with quality
+		$.each(this.paperButtons, function(key, button) {
+			var type = paperTypes[key];
+			var pct = Math.min(Math.floor(100 * insightCount / type.insight), 100);
+			button.html(type.name + "(" + Math.floor(insightCount) + "/" + type.insight + ")");
+		});
+	},
+
+	onComplete: function() {
+		this.completionBar.holder.remove();
+		var spinoff = $("<button/>", {
+			html: "spinoff new project"
+		}).appendTo(this.actionDiv);
+	},
+
+	onGainProgress: function(count) {
+		var pct = this.progress / this.max;
+		console.log(pct);
+		this.gainInsights(Math.pow(insightRamp, pct * 3) * count * insightPerProgress);
+	},
+
 	tick: function() {
 		console.log("project tick");
-		this.completionBar.update(this.progress, this.rate);
-		this.rate = 0;
+		this.checkProgress();
 	},
 
 	fillView: function() {
@@ -187,7 +393,8 @@ var Project = Entity.extend({
 			html: this.name
 		}).appendTo(this.infoDiv);
 
-		this.completionBar = new ProgressBar(this.actionDiv, "", this.max);
+		this.completionBar = new ProgressBar(this.statDiv, "", this.max);
+		this.insightView = new ValueView(this.statDiv, "insights");
 
 		this.graph = $("<div/>", {
 			class: "entity-difficultyGraph",
@@ -197,21 +404,33 @@ var Project = Entity.extend({
 		this.socket = createSocket(this.socketColumn, "researching", this);
 
 
-		this.rerollButton = $("<button/>", {
-			class: "entity-reroll",
-			html: "🎲"
-		}).appendTo(this.actionDiv).click(function() {
-			project.reroll();
-			project.refreshView();
+		var paperButtons = $("<div/>", {
+			html: "<div class='minitext'>Write a </div>"
+		}).appendTo(this.actionDiv);
 
+
+		this.paperButtons = {};
+		$.each(paperTypes, function(typeName, type) {
+			project.paperButtons[typeName] = $("<button/>", {
+				html: type.name,
+
+			}).appendTo(paperButtons).click(function() {
+
+				// pay the insights
+				var insights = Math.min(project.insights, type.insight);
+				var insightPct = insights / type.insight;
+				project.payInsights(insights);
+				world.generatePaper(project, type, insightPct);
+			});
 		});
 
+		this.addButtons();
 
 		this.tagDiv.html("");
 		$.each(this.tags, function(key, tag) {
-			console.log(tag);
 			createSkillChip(project.tagDiv, tag);
 		});
+		this.gainProgress(0);
 	},
 
 

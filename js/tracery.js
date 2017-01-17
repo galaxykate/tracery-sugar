@@ -28,7 +28,7 @@ var tracery = (function() {
 			}
 		}
 
-		console.log(Object.keys(this.symbols));
+		//console.log(Object.keys(this.symbols));
 	};
 
 	TraceryGrammar.prototype.addModifiers = function(mods) {
@@ -578,7 +578,7 @@ var tracery = (function() {
 							if (fxn === undefined) {
 								node.errors.push("No modifier " + inQuotes(name));
 								mod.finished += "[[." + name + "]]";
-							
+
 							} else {
 								if (mod.parameters === undefined)
 									mod.parameters = [];
@@ -838,7 +838,6 @@ var tracery = (function() {
 					},
 
 					a: function(s) {
-						console.log("AAAAA");
 						if (s.length > 0) {
 							if (s.charAt(0).toLowerCase() === 'u') {
 								if (s.length > 2) {
@@ -910,7 +909,7 @@ var tracery = (function() {
 		//'#emoji##name#' for a in /emojiTable [emoji:a/emoji][name:a/name] ''
 		//"'#myNum##animal#' for myNum in number", "'#myNum##myAnimal#' for myNum in number for myAnimal in animal",
 		tests: {
-			rule: ["foo", "\\\\\\foo", "foo#bar#", "#animalName.capitalize.s#", "foo#missingSymbol#", "foo[bar]", "foo[#bar#]", "[#animalName.replace([vowel],'X')#]", "[range(0,4,5)]", "[join([range(0,4,5)],',')]", "[doSomethingWithNoReturn(#foo#)]", "foo\\#bar\\#", "\\[foo{#'\\]", "(#foo#)", "!صَبَاحُ الخَيْر", "בוקר טוב.", "早上好", "I 💖 emoji🏄🏾"],
+			rule: ["[/names/british/female]","#/names/british/female/3#", "for x in ", "foo", "\\\\\\foo", "foo#bar#", "#animalName.capitalize.s#", "foo#missingSymbol#", "foo[bar]", "foo[#bar#]", "[#animalName.replace([vowel],'X')#]", "[range(0,4,5)]", "[join([range(0,4,5)],',')]", "[doSomethingWithNoReturn(#foo#)]", "foo\\#bar\\#", "\\[foo{#'\\]", "(#foo#)", "!صَبَاحُ الخَيْر", "בוקר טוב.", "早上好", "I 💖 emoji🏄🏾"],
 			//rule: ["#animalName.replace([vowel],'X')#"],
 			//rule: ["['#x# + 1' for foo in number1]"],
 			//rule: ["<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'>['<circle fill=\\'hsl([(x*10 + y*50)],50%,[(y)]0%)\\' cx=\\'[ (x * #/spacing/x# + 15)  ]\\' cy=\\'[ (y * #/spacing/y# + 15)  ]\\' r=\\'[(random(10) + 3)]\\'/>' for x in number for y in number ]<svg>"],
@@ -959,7 +958,7 @@ var tracery = (function() {
 
 
 				createDiagram(node, div);
-				console.log(node.finished);
+				console.log(node);
 
 				var html = $("<div/>", {
 
@@ -979,7 +978,9 @@ var tracery = (function() {
 		test: function() {
 
 			var worldObject = {
-				foo: "WORLD_FOO",
+				foo: {
+					bar: "WORLD_FOO",
+				},
 				count: {
 					value: "**I'm a path!**"
 				},
@@ -1029,7 +1030,7 @@ var tracery = (function() {
 				count: 3,
 				name: ["Sniffly", "Mittens", "Nelson", "Mipsy", "Wellington"],
 
-			});
+			}, true);
 
 			grammar.functions = {
 				startsWith: function(c) {
@@ -1112,7 +1113,7 @@ var tracery = (function() {
 			};
 
 
-			grammar.modifiers = {
+			grammar.addModifiers({
 
 
 				foo: function(s) {
@@ -1158,7 +1159,7 @@ var tracery = (function() {
 
 					return s;
 				}
-			}
+			});
 
 			var displayHolder = $("#panel-expansion .panel-content");
 
