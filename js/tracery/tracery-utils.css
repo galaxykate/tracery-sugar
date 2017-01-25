@@ -1,6 +1,6 @@
 
 .large {
-	font-size: 40px;
+	font-size: 10px;
 }
 
 .traceryparse-diagram {
@@ -245,9 +245,11 @@
 
 .traceryparse-header {
 	font-size: 9px;
+	 white-space: normal;
 	
 }
 .traceryparse-footer {
+	 white-space: normal;
 	padding: 0px 3px;
 	font-size: 9px;
 	

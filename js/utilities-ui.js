@@ -17,21 +17,24 @@ var ValueView = Class.extend({
 	},
 
 	update: function(value) {
+
 		if (this.isInteger)
 			value = Math.floor(value);
+		
 		this.value.html(value);
 		this.lastValue = value;
 	}
 });
 
 var ProgressBar = Class.extend({
-	init: function(holder, label, max) {
+	init: function(holder, label, max, isInteger) {
 		this.stats = {
 			max: max,
 			value: max / 2,
 			pct: 0,
 			rate: 0
 		}
+		this.isInteger = isInteger;
 		this.holder = $("<div/>", {
 			class: "progress-holder"
 		}).appendTo(holder);
@@ -73,16 +76,20 @@ var ProgressBar = Class.extend({
 
 	},
 
+	remove: function() {
+this.holder.remove();
+	},
+
 	update: function(value, rate) {
-		this.stats.value = value;
+		this.stats.value = Math.min(value, this.stats.max);
 		this.stats.rate = rate;
 		this.stats.pct = this.stats.value / this.stats.max;
 		this.fill.css({
-			width: (this.stats.pct * 100) + "%"
+			width: Math.min(100, Math.max(5, (this.stats.pct * 100))) + "%"
 		});
 
-		this.rate.html("(" + this.stats.rate + "/s)");
-		this.value.html(this.stats.value + "/" + this.stats.max);
+		this.rate.html("(" + this.stats.rate.toFixed(2) + "/s)");
+		this.value.html(Math.round(this.stats.value) + "/" + this.stats.max);
 
 	},
 
@@ -190,3 +197,7 @@ var Panel = Class.extend({
 	}
 
 });
+
+function getRandom(arr) {
+	return arr[Math.floor(arr.length * Math.random())];
+}

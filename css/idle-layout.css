@@ -1,0 +1,480 @@
+
+
+
+@media only screen and (max-width: 500px) {
+  body {
+    background-color: blue;
+  }
+  main{ 
+    flex-direction: column;
+  }
+
+}
+
+
+
+body {
+   background-color: hsla(20, 50%, 90%, 1);
+}
+
+.game {
+  padding: 5px;
+margin: 0px auto;
+ max-width: 1000px;
+ background-color: hsla(30, 50%, 80%, 1);
+ box-shadow: 1px 0px 15px rgba(0, 0, 0, .6);
+}
+body {
+  margin: 0px;
+  width: 100%;
+  height: 100%;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+main{
+
+ width: 100%;
+ height: 100%;
+ display: flex;
+}
+
+#lab-data {
+  flex-direction: column;
+  display: flex;
+}
+
+#lab-stats {
+  background-color: hsla(220, 50%, 50%, .4);
+}
+
+#lab-name {
+  background-color: hsla(250, 50%, 50%, .4);
+}
+#lab {
+  overflow: hidden;
+  max-width: 500px;
+  flex-direction: column;
+  flex: 1;
+  display: flex;
+  background-color: hsla(20, 50%, 50%, .4);
+}
+
+#work {
+   overflow: hidden;
+  flex-direction: column;
+  flex: 1;
+  display: flex;
+  
+
+}
+
+.slidersection {
+  z-index: 20;
+  position: relative;
+  transition: all .2s ease-in-out;
+  flex: .23;
+  height: 10px;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.slidersection.open {
+ 
+  flex: 1;
+}
+
+.content {
+   z-index: 50;
+  transition: all .1s ease-in-out;
+  flex: 1;
+   background-color: hsla(120, 0%, 50%, 1);
+  opacity: .4;
+  overflow-y: scroll;
+  overflow-x: hidden;
+ 
+}
+#projects {
+  z-index: 70;
+  box-shadow: 2px 1px 10px rgba(0, 0, 0, .6);
+}
+#calendar {
+
+  z-index: 80;
+  box-shadow: 2px 1px 10px rgba(0, 0, 0, .5);
+}
+.open .content {
+  position: relative;
+   background-color: hsla(120, 0%, 100%, 1);
+  opacity: 1;
+}
+
+
+#whiteboard .content {
+  padding:15px;
+font-family: 'Permanent Marker', cursive;
+  background-color: white;
+}
+
+
+#whiteboard .idea {
+ margin:5px;
+padding: 2px 4px;
+  display: inline-block;
+border-radius: 20px;
+
+}
+
+
+.slidersection.open .content{
+  transition: all .2s ease-in-out;
+
+ 
+}
+
+
+
+#people {
+  overflow-y: scroll;;
+  margin: 5px;
+  
+  flex: 1;
+}
+
+
+#overlay {
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: hsla(320, 10%, 50%, .8);
+
+}
+
+
+#drag-overlay {
+z-index: 200;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+
+pointer-events: none;
+}
+
+
+
+#overlay-center {
+  pointer-events: none;
+  display: flex;
+
+
+}
+
+
+
+#overlay-padding {
+ pointer-events: none;
+ flex: 1;
+
+}
+
+#popup {
+  text-align: center;
+  flex: .4;
+  min-height: 50px;
+   min-width: 350px;
+  padding: 5px 8px;
+  border-radius: 10px;
+  box-shadow: 1px 3px 10px rgba(0, 0, 0, .5);
+  background-color: hsla(320, 50%, 90%, .8);
+
+}
+
+
+#popup-buttons {
+   text-align: center;
+  pointer-events: all;
+    display: flex;
+  flex-direction: row;
+}
+
+.button-column {
+   min-width: 90px;
+  flex: 1;
+}
+
+.card .main {
+   display: flex;
+  flex-direction: row;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  vertical-align:top;
+   position: relative;
+  padding: 5px 0px 0px 5px;
+  margin: 2px 0px 0px 0px;
+  border-radius: 10px;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, .5);
+  background-color: hsla(30, 10%, 98%, 1);
+  border: 4px solid hsla(30, 40%, 40%, .3);
+}
+
+.card.selected {
+  border: 4px solid hsla(30, 40%, 40%, .9);
+   background-color: hsla(30, 14%, 94%, 1);
+}
+
+
+.entityspan {
+  font-weight: bold;
+}
+
+.socket-column {
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  min-height: 30px;
+  min-width: 30px;
+  max-width: 80px;
+   }
+
+   .socket-label {
+    font-size: 70%;
+   }
+
+.project {
+  margin: 9px 0px;
+   box-shadow: 0px 1px 4px rgba(0, 0, 0, .7);
+}
+
+
+.dataline {
+   display: flex;
+  flex-direction: row;
+  vertical-align:top;
+   position: relative;
+}
+
+
+.dataelem {
+  padding: 2px 4px;
+  vertical-align:top;
+    position: relative;
+  display: inline-block;
+  flex: 1;   
+}
+
+
+
+.base {
+  display: flex;
+  flex-direction: row;
+}
+.data {
+   position: relative;
+  display: inline-block;
+ flex:1;
+}
+
+.name {
+  flex:1;
+
+}
+
+.minitext {
+  color: rgba(0, 0, 0, .5);
+  font-style: italic;
+  font-size: 80%;
+} 
+.details {
+  color: rgba(0, 0, 0, .5);
+  font-style: italic;
+  font-size: 80%;
+} 
+.socket-holder {
+  text-align: center;
+flex: 1;
+}
+.socket {
+  
+  display: inline-block;
+  min-height: 30px;
+  min-width: 30px;
+  vertical-align:top;
+  position: relative;
+  text-align: center;
+  padding: 1px 1px;
+  margin: 2px;
+  border-radius: 10px;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, .5);
+  background-color: hsla(80, 0%, 90%, 1);
+}
+
+.socket.droppable-hover {
+   background-color: hsla(280, 80%, 50%, 1);
+}
+.socket.droppable-active {
+   background-color: hsla(280, 60%, 80%, 1);
+}
+
+.papers {
+  width: 100%;
+}
+
+.activity {
+    flex: 0;   
+  text-align: right;
+  width: 60px;
+}
+
+.name {
+  font-weight: bold;
+}
+
+
+.paper-stat {
+  font-size: 80%;
+}
+
+.paper-details {
+  margin: 2px;
+  padding: 2px 4px;
+  vertical-align:center;
+  border-radius: 50px;
+ 
+  
+}
+
+.header {
+  height: 4px;
+  z-index: 90;
+  box-shadow: 0px 0px 7px 2px rgba(0, 0, 0, .4);
+  background-color: hsla(0, 0%, 90%, 1);
+}
+
+svg {
+  position: relative;
+  width: 80%;
+  height: 80%;
+}
+.meeple {
+ display: inline-block;
+   color: hsl(120, 50%, 50%);
+ width: 28px;
+ height: 28px;
+ padding: 1px 2px 1px 0px;
+  vertical-align:top;
+  position: relative;
+  text-align: center;
+
+  margin: 2px;
+  border-radius: 100px;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, .5);
+  background-color: hsla(220, 90%, 30%, 1);
+}
+
+.tags {
+
+  flex: 1;
+}
+
+.tag {
+  display: inline-block;
+   border-radius: 100px;
+   margin: 2px;
+ padding: 1px 5px;
+  vertical-align:top;
+  position: relative;
+  text-align: center;
+font-size: 80%;
+
+ box-shadow:  1px 1px 1px rgba(0, 0, 0, .5);
+  border: 1px  outset hsla(220, 90%, 40%, 1);
+  background-color: hsla(220, 90%, 70%, 1);
+}
+.tag-meta {
+ border: 1px  outset hsla(20, 90%, 40%, 1);
+  background-color: hsla(20, 90%, 70%, 1);
+}
+.tag-meta.groupSelected {
+   box-shadow: 0px 1px 1px rgba(0, 0, 0, .9),  1px 1px 2px 5px hsla(20, 90%, 40%, 1);
+}
+
+.tag-focus {
+ border: 1px  outset hsla(210, 90%, 40%, 1);
+  background-color: hsla(210, 90%, 70%, 1);
+}
+.tag-focus.groupSelected {
+   box-shadow: 0px 1px 1px rgba(0, 0, 0, .9),  1px 1px 2px 5px hsla(210, 90%, 40%, 1);
+}
+
+.tag-approach {
+ border: 1px  outset hsla(190, 90%, 40%, 1);
+  background-color: hsla(190, 90%, 70%, 1);
+}
+.tag-approach.groupSelected {
+   box-shadow: 0px 1px 1px rgba(0, 0, 0, .9),  1px 1px 2px 5px hsla(190, 90%, 40%, 1);
+}
+
+.tag-content {
+ border: 1px  outset hsla(230, 90%, 40%, 1);
+  background-color: hsla(230, 90%, 70%, 1);
+}
+.tag-content.groupSelected {
+   box-shadow: 0px 1px 1px rgba(0, 0, 0, .9),  1px 1px 2px 5px hsla(230, 90%, 40%, 1);
+}
+
+.tag-misc {
+ border: 1px  outset hsla(280, 90%, 40%, 1);
+  background-color: hsla(280, 90%, 70%, 1);
+}
+
+
+.tag-misc.groupSelected {
+   box-shadow: 0px 1px 1px rgba(0, 0, 0, .9),  1px 1px 2px 5px hsla(280, 90%, 40%, 1);
+}
+
+
+.toDelete {
+  opacity: .5;
+}
+
+.announcements {
+  border-radius: 10px;
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, .5);
+  padding: 4px;
+   background-color: hsla(0, 20%, 90%, 1);
+  width: 96%;
+  height: 70px;
+  overflow: scroll;
+}
+
+.announcement{
+ font-size: 70%;
+ margin: 2px;
+}
+
+
+.reroll-button {
+
+  font-size: 18px;
+  width: 30px;
+  height: 30px;
+   background-color: hsla(320, 0%, 80%, 1);
+   border: 1px  outset hsla(320, 0%, 50%, 1);
+}
+button {
+  
+   box-shadow: 0px 1px 1px rgba(0, 0, 0, .9);
+  margin: 1px;
+  border-radius: 30px;
+  border: 1px  outset hsla(320, 90%, 50%, 1);
+  background-color: hsla(320, 90%, 80%, 1);
+}

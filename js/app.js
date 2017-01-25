@@ -2,9 +2,9 @@ $(document).ready(function() {
 	console.log("start");
 
 
-new Panel("expansion", $("#panel-holder"));
-new Panel("rule", $("#panel-holder"));
-new Panel("preview", $("#panel-holder"));
+new Panel("expansion", $("#panel-holder"),undefined,  true);
+new Panel("rule", $("#panel-holder"),undefined,true);
+new Panel("preview", $("#panel-holder"),undefined, true);
 
 
 
@@ -28,6 +28,6 @@ new Panel("preview", $("#panel-holder"));
 	//node.expand();
 
 	//var viz = new TraceryNodeViz(node, $("#panel-expansion .panel-content"))
-	tracery.test();
+	testTracery();
 	
 });

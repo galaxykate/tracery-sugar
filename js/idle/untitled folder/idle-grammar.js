@@ -3,12 +3,12 @@ var rawGrammar = {
 	whiteboardSuccess: ["?", "???", "X", "(papers)", "GRANTZ!", "$$$", "!", "win", "yes", "MAYBE"],
 	idea: ["#a# and #b#", "#a# & #b#", "#a# & #b#->#whiteboardSuccess#", "#a# + #b# = #whiteboardSuccess#", "#a# -> #b# -> #whiteboardSuccess#", "1. #a# 2. #b# 3. #whiteboardSuccess#", "#b#, but #for# #a#"],
 
-	genre_raw: ["ARG", "dating sim", "pet simulator", "farming simulator", "idlegame", "soap opera", "roguelike", "survival horror game", "MetroidVania", "text adventure", "tactical RPG", "social game", "horror game", "slot machine", "MMO", "card game", "stealth game", "puzzle game", "walking simulator", "board game", "fighting game", "eurogame", "simulation game", "flight simulator", "MOBA", "tower defense", "LARP", "trivia game", "incremental game", "rail shooter", "real-time strategy game", "exergame", "racing sim", "advergame", "serious game", "Match-3", "imperfect information game", "therapy game", "survival game", "tabletop RPG", "Twine game", "visual novel", "physics platformer", "first-person shooter", "stealth game", "JRPG", "pinball"],
-	game_raw: ["VR", "augmented reality", "Goat Simulator", "Neko Atsume", "Frog Fractions", "Monument Valley", "Undertale", "online poker", "interactive fiction", "chess", "poker", "Stardew Valley", "Street Fighter", "Overwatch", "Minecraft", "FIFA 16", "Skyrim", "Tony Hawk's Pro Skater", "Pong", "NBA Jam", "Counter-Strike", "Spelunky", "Cookie Clicker", "Bejeweled", "Settlers of Catan", "Candy Crush", "Risk", "Dwarf Fortress", "the Sims 4", "Ms Pac Man", "Tetris", "SimCity", "Sokoban", "Rogue", "StarCraft", "Monkey Island II", "SimCity", "Rock Band", "Go", "League of Legends", "Hearthstone", "Magic the Gathering", "Pokemon Go", "Civilization V", "Eve Online", "Super Mario Bros"],
+	genre: ["ARG", "dating sim", "pet simulator", "farming simulator", "idlegame", "soap opera", "roguelike", "survival horror game", "MetroidVania", "text adventure", "tactical RPG", "social game", "horror game", "slot machine", "MMO", "card game", "stealth game", "puzzle game", "walking simulator", "board game", "fighting game", "eurogame", "simulation game", "flight simulator", "MOBA", "tower defense", "LARP", "trivia game", "incremental game", "rail shooter", "real-time strategy game", "exergame", "racing sim", "advergame", "serious game", "Match-3", "imperfect information game", "therapy game", "survival game", "tabletop RPG", "Twine game", "visual novel", "physics platformer", "first-person shooter", "stealth game", "JRPG", "pinball"],
+	game: ["VR", "augmented reality", "Goat Simulator", "Monument Valley", "Undertale", "online poker", "interactive fiction", "chess", "poker", "Stardew Valley", "Street Fighter", "Overwatch", "Minecraft", "FIFA 16", "Skyrim", "Tony Hawk's Pro Skater", "Pong", "NBA Jam", "Counter-Strike", "Spelunky", "Cookie Clicker", "Bejeweled", "Settlers of Catan", "Candy Crush", "Risk", "Dwarf Fortress", "the Sims 4", "Ms Pac Man", "Tetris", "SimCity", "Sokoban", "Rogue", "StarCraft", "Monkey Island II", "SimCity", "Rock Band", "Go", "League of Legends", "Hearthstone", "Magic the Gathering", "Pokemon Go", "Civilization V", "Eve Online", "Super Mario Bros"],
 
-	content_raw: ["content", "music", "navigation", "physics", "physics puzzles", "humor", "character creators", "user creativity", "emotional affect", "deck building", "color palettes", "weapons", "emergent behavior", "textures", "trees", "level layout", "obstacle placement", "matchmaking", "dialog trees", "quests", "minigames", "skill trees", "art styles", "shaders", "characters", "tutorials", "landscapes", "narrative", "rule-sets", "behavior", "tactics", "long-term strategy", "teammates", "enemies", "traps", "competitions", "evaluation metrics", "NPC behavior", "love triangles", "crafting recipes", "crafting system", "navmeshes", "relationships", "weapons", "quests", "dialogue", "difficulty curves", "difficulty", "matchmaking", "emotional affect", "maps", "terrain", "skyboxes", "interiors", "flavor text", "stories", "drama", "suspense", "audio"],
+	content: ["content", "music", "navigation", "physics", "physics puzzles", "humor", "character creators", "user creativity", "emotional affect", "deck building", "color palettes", "weapons", "emergent behavior", "textures", "trees", "level layout", "obstacle placement", "matchmaking", "dialog trees", "quests", "minigames", "skill trees", "art styles", "shaders", "characters", "tutorials", "landscapes", "narrative", "rule-sets", "behavior", "tactics", "long-term strategy", "teammates", "enemies", "traps", "competitions", "evaluation metrics", "NPC behavior", "love triangles", "crafting recipes", "crafting system", "navmeshes", "relationships", "weapons", "quests", "dialogue", "difficulty curves", "difficulty", "matchmaking", "emotional affect", "maps", "terrain", "skyboxes", "interiors", "flavor text", "stories", "drama", "suspense", "audio"],
 
-	approach_raw: ["simple tree search", "A*", "GOAP", "grammar induction", "finite state machines", "deep learning", "constraint solving", "search", "simulated annealing", "genetic programming", "fuzzy logic", "decision networks", "hill-climbing", "classifiers", "multilayer perceptrons", "RNNs", "gradient descent", "knowledge representation", "regret-based optimization", "neural networks", "Markov Chains", "social intelligence", "crowdsourcing", "Monte Carlo tree search", "imitative learning", "swarm intelligence", "multi-agent planning", "reinforcement learning", "case-based reasoning", "Bayesian models", "opponent modelling", "adversarial planning", "Monte Carlo planning", "benchmarks", "stochastic AI", "NLP", "pathfinding", "situated approaches", "clustering", "expert systems", "evolutionary algorithms", "mixed initiative interfaces", "finite state machines", "genetic algorithms", "behavior trees", "LSTMs", "topological mapping", "grammars", "grammatical evolution"],
+	approach: ["simple tree search", "A*", "GOAP", "grammar induction", "finite state machines", "deep learning", "constraint solving", "search", "simulated annealing", "genetic programming", "fuzzy logic", "decision networks", "hill-climbing", "classifiers", "multilayer perceptrons", "RNNs", "gradient descent", "knowledge representation", "regret-based optimization", "neural networks", "Markov Chains", "social intelligence", "crowdsourcing", "Monte Carlo tree search", "imitative learning", "swarm intelligence", "multi-agent planning", "reinforcement learning", "case-based reasoning", "Bayesian models", "opponent modelling", "adversarial planning", "Monte Carlo planning", "benchmarks", "stochastic AI", "NLP", "pathfinding", "situated approaches", "clustering", "expert systems", "evolutionary algorithms", "mixed initiative interfaces", "finite state machines", "genetic algorithms", "behavior trees", "LSTMs", "topological mapping", "grammars", "grammatical evolution"],
 
 
 	randomAcronym: [],
@@ -19,10 +19,10 @@ var rawGrammar = {
 	techniqueNamePrefix: ["deep", "top", "next", "multi", "viz", "ludo", "plot", "gen", "smart", "sim", "bot", "dev", "code", "sys"],
 	techniqueNameSuffix: ["bot", "buddy", "pal", ".AI", "AI", "eval", "stream", "form", "think", "maker", "space", "mind", "brain", "mesh", "net", "source", "scope", "sys"],
 
-	codeName: ["#projectDesc.acronym#", "#projectDesc.acronym#", "#projectDesc.acronym#", "#projectDesc.acronym#", "#projectDesc.acronym#", "#projectDesc.acronym#", "#techniqueNamePrefix.capitalize##techniqueNameSuffix.capitalize#", "#firstName.allCaps.despace#", "#firstName.allCaps.despace#", "#firstName.allCaps.despace#", "the #firstName.allCaps.despace# Project", "Project #firstName.allCaps.despace#"],
+	projectName: ["#projectDesc.acronym#", "#projectDesc.acronym#", "#projectDesc.acronym#", "#techniqueNamePrefix.capitalize##techniqueNameSuffix.capitalize#", "#firstName.allCaps.despace#", "the #firstName.allCaps.despace# Project", "Project #firstName.allCaps.despace#"],
 	projectDesc: ["#focus# #content#", "#focus# #approach#"],
 
-	project: ["#codeName.capitalize#: #approach# for #focus# #content#"],
+	project: ["#codeName#: #approach# for #focus# #content#"],
 
 	verb_present: ["predict", "evolve", "generate", "evaluate", "benchmark", "build", "model", "plan", "analyze", "learn"],
 	verb: ["predicting", "evolving", "generating", "evaluating", "benchmarking", "building", "modelling", "analyzing", "learning"],
@@ -36,7 +36,7 @@ var rawGrammar = {
 	bumper: ["when #verb# isn't enough", "from #verb# to #verb#", "#approach# isn't #adj_science#", "if it's not #approach# then it's not #adj_science#"],
 
 	work: ["#work_passive#", "#work_active#"],
-	work_passive: ["framework<frameworks>", "taxonomy<taxonomies>", "proposal", "history<histories>", "comparative history<histories>"],
+	work_passive: ["framework", "taxonomy", "proposal"],
 	work_active: ["comparison", "critique", "evaluation", "study"],
 
 	competition: ["competition", "contest", "challenge"],
@@ -45,13 +45,7 @@ var rawGrammar = {
 	for: ["in", "for", "with"],
 
 
-
 	paper: [
-		"Comparing #approach# and #approach_raw# for #adj# #content#",
-		"#approach.capitalize# #for# #focusPlural#: #adj.a# #work#",
-		"#approach.capitalize# #for# #focusPlural#: #work.a#",
-		"#approach.capitalize# #for# #focusPlural#: #work.a# with #codeName#",
-
 		"#codeName#: #regular_paper.capitalize#",
 		"#codeName#: #regular_paper.capitalize#",
 		"#codeName#: #regular_paper.capitalize#",
@@ -63,31 +57,31 @@ var rawGrammar = {
 		"#regular_paper.capitalize#",
 		"#regular_paper.capitalize#",
 		"#regular_paper.capitalize#",
-		"#approach.capitalize# #for# #adj# #focusPlural#: #work.a#",
-
+		"#approach.capitalize# #for# #adj# #focus#: #work.a#",
+		"#approach.capitalize# #for# #focus#: #adj.a# #work#",
+		"#approach.capitalize# #for# #focus#: #work.a#",
+		"#approach.capitalize# #for# #focus#: #work.a# with #codeName#",
 		"#question.capitalize#? #regular_paper.capitalize#",
 		"#bumper.capitalize#: #regular_paper.capitalize#",
-
 	],
 	//These are fun, and can have anything put after them - almost.
 	//Some papers (like competition results, or anything with its own subhead) don't work.
 	//I'm not sure the best way to structure this, so I goofed it up.
 
 	regular_paper: [
-
 		"#adj.capitalize# #content# #through# #approach#",
 		"#verb.capitalize# #adj# #content# #through# #approach#",
-		"#verb.capitalize# #adj# #content# #for# #focusPlural#",
+		"#verb.capitalize# #adj# #content# #for# #focus#",
 		"#focus# #content# #through# #codeName# #approach#",
 		"#approach# #for# #adj# #focus# #content#",
 		"#verb# #focus# #content# with #codeName#",
 		"#verb# #focus# #content# #through# #approach#",
-		"#approach# #for# #focusPlural#: #taxonomy.a#",
-		"A #taxonomy# #for# #approach# #for# #focusPlural#",
+		"#approach# #for# #focus#: #taxonomy.a#",
+		"A #taxonomy# #for# #approach# #for# #focus#",
 		//Mike added this stuff
-		"#content.a# #work_passive# for #focusPlural#",
-		"A #work_active# of #approach# #for# #focusPlural#",
-		"#thing.a# for #adj_science# #content# in #focusPlural#",
+		"#content.a# #work_passive# for #focus#",
+		"A #work_active# of #approach# #for# #focus#",
+		"#thing.a# for #adj_science# #content# in #focus#",
 		"results of the 2017 #focus.capitalizeAll# AI #competition#",
 	],
 
@@ -99,26 +93,21 @@ var rawGrammar = {
 	personality: ["local politician", "ballet dancer", "Youtube star", "beauty blogger", "mommy blogger", "yoga instructor", "opera singer", "pro gamer", "#cause# advocate", "#cause# organizer", "body builder", "beauty queen", "libertarian", "slam poet", "activist", "vegan", "librarian", "pianist", "scuptor", "marine", "scuba diver", "caffeine addict", "circus performer", "burlesque dancer", "DJ", "internet celebrity", "improv actor", "skydiver", "veterinarian", "artist", "performance artist", "child prodigy", "trapeeze artist", "gymnast", "sailor", "martial arts master"],
 	ex: ["competitive ", "part-time ", "recovering ", "aspiring ", "former "],
 	personalityPlus: ["#personality#", "#ex##personality#", "#ex##personality#"],
-	gradStuff: ["writing #media#", "academia", "teaching", "early mornings", "cheese", "screenreaders", "e-readers", "snacks", "free food", "free time", "cilantro", "all-nighters", "sleeping", "research", "hot-tubbing", "herbal tea", "dancing", "bike repair", "cardio", "the gym", "meditation", "mentoring undergrads", "Netflix", "Twitch", "pubcrawls", "coffee", "espresso", "wine", "beer", "#socialMedia#"],
+	gradStuff: ["academia", "teaching", "early mornings", "cheese", "screenreaders", "e-readers", "snacks", "free food", "free time", "cilantro", "all-nighters", "sleeping", "research", "hot-tubbing", "herbal tea", "dancing", "bike repair", "cardio", "the gym", "meditation", "mentoring undergrads", "Netflix", "Twitch", "pubcrawls", "coffee", "espresso", "wine", "beer", "#socialMedia#"],
 	socialMedia: ["LinkedIn", "Facebook", "Tinder", "DeviantArt", "Twitch", "Twitter", "Instagram", "Vine"],
 	stuff: ["#mediaPlus#", "#gradStuff#"],
-	mediaPlus: ["#game_raw#", "#mediaAdj# #media#"],
+	mediaPlus: ["#game#", "#mediaAdj# #media#"],
 	instrument: ["cello", "bass guitar", "flute", "violin", "kazoo", "piano", "accordion", "ukulele", "guitar"],
 	jazz: ["classical", "jazz", "electric", "synth", "experimental", "avante-garde"],
 	mediaAdj: ["French", "Japanese", "Korean", "Chinese", "Bollywood", "badly-translated", "vintage", "bootleg", "abstract", "avant-garde", "punk"],
-	media: ["#genre_raw.s#", "#genre_raw.s#", "#genre_raw.s#", "poetry", "novels", "film", "romance novels", "theater", "comics", "game shows", "soap operas", "musicals", "movies", "anime", "art films", "reality TV", "video games"],
+	media: ["#genre.s#", "#genre.s#", "#genre.s#", "film", "comics", "game shows", "soap operas", "musicals", "movies", "anime", "art films", "reality TV", "video games"],
 	instrumentPlus: ["#instrument#", "#jazz# #instrument#", "#instrument# in #jazz.a# band"],
 	rad: ["spiky", "punk", "understated", "enigmatic", "secretive", "vintage", "retro", "cool", "sinister", "rad", "80s throwback", "problematic"],
-	cause: ["animal rights", "BLM", "homeless rights", "voting rights", "environmental", "education", "public policy"],
+	cause: ["animal rights", "Black Lives", "homeless rights", "voting rights", "environmental", "education", "public policy"],
 	tattoos: ["hair", "sunglasses", "fashion sense", "glasses", "jewelry", "tattoos", "dance skills"],
 	stuffReaction: ["hates", "loves", "likes", "allergic to", "addicted to"],
 	famous: ["has multiple profiles on", "currently refreshing", "popular on", "famous on", "mildly famous on", "always on", "usually surfing", "just installed", "recently uninstalled"],
-	personFlavor: ["#hasPet# #petCompound#", "#famous# #socialMedia#", "#personalityPlus#", "#personalityPlus#", "has #rad# #tattoos#", "plays #instrumentPlus#", "#stuffReaction# #stuff#", "#stuffReaction# #stuff#", "#stuffReaction# #stuff# and #stuff#"],
-	hasPet: ["fosters", "adopted", "volunteers with", "has", "has", "has", "takes care of", "inherited"],
-	pet: ["corgi", "labradoodle", "golden retriever", "Saint Bernard", "ball python", "kid", "toddler", "baby", "goat", "alpaca", "chicken", "sheepdog", "chihuahua", "bunny", "gerbil", "mutt", "grey tuxedo cat", "Maine Coone", "Siamese cat", "Himalayan cat", "kitten", "calico kitten", "guinea pig", "rabbit", "pony"],
-	petAdj: ["therapy", "well-behaved", "antisocial", "unusually intelligent", "Instagram-famous", "misanthropic", "adopted", "rescued", "foster", "elderly", "shy", "enormous", "miniature", "sleepy", "outgoing", "cuddly"],
-	petCompound: ["#petAdj.a# #pet#", "#pet.a#", "two #pet.s#", "a house full of #pet.s#"],
-
+	personFlavor: ["#famous# #socialMedia#", "#personalityPlus#", "has #rad# #tattoos#", "plays #instrumentPlus#", "#stuffReaction# #stuff#", "#stuffReaction# #stuff# and #stuff#"],
 
 	// Grants n such
 
@@ -141,18 +130,18 @@ var rawGrammar = {
 
 
 	journal: ["#publication# on #event_topic#",
-		"#publication# on #shortJournal#",
-		"#shortJournal#",
+	"#publication# on #shortJournal#",
+	"#shortJournal#",
 		"#fancy_publication# #shortJournal#",
 		"#funding_area#",
 		"#event_topic#"
 	],
 
-	char: "abcdefghijklmnopqrstuvwxyz".split(""),
-	digit: "0123456789".split(""),
-	nth: ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"],
-
-	conference: [
+    char: "abcdefghijklmnopqrstuvwxyz".split(""),
+    digit: "0123456789".split(""),
+    nth: ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"],
+ 
+	conf: [
 		"2017 #publication_event# #shortJournal#",
 		"#fancy_publication# #shortJournal#",
 		"#publication_event# #event_topic#",
@@ -161,7 +150,7 @@ var rawGrammar = {
 		"2017 #region# #publication_event# #shortJournal#"
 	],
 
-
+	
 
 	event_topic: ["#subsubject# in #euphemism#", "#subject# and #euphemism#", "#subject# and #euphemism#", "#subject# in #euphemism# and #euphemism#", "#sub_adj# #subsubject# #event_things#"],
 
@@ -181,16 +170,14 @@ var rawGrammar = {
 	labName: ["The #adj.capitalizeAll# #intelligence.capitalizeAll# #studio.capitalizeAll#", "#adj.capitalizeAll# #intelligencePlural.capitalizeAll# #studio.capitalizeAll#", "The #intelligence.capitalizeAll# & #intelligence.capitalizeAll# #studio.capitalizeAll#", "The #studio.capitalizeAll# for #adj.capitalizeAll# #intelligence.s.capitalizeAll#"]
 }
 
-var metaskills = ["writing", "chilling", "learning", "brainstorming", "researching", "leadership"];
+var metaskills = ["writing", "chilling", "brainstorming", "researching", "leadership"];
 var skills = {
 	focus: [],
 	content: [],
 	approach: [],
-	meta: [],
-	misc: []
+	meta: []
 };
 var allSkills = [];
-var skillsByKey = {};
 
 function addTags(list, type, retag, pluralize) {
 
@@ -199,96 +186,51 @@ function addTags(list, type, retag, pluralize) {
 
 		var skill = {
 			name: s,
-			plural: s,
+			tag: s,
 			key: toCamelCase(s),
 			type: type
 		}
 
 		if (pluralize)
-			skill.plural += "s";
+			skill.name += "s";
 
 		allSkills.push(skill);
 		skills[type].push(skill);
 
 		if (retag)
-			list[i] += "<" + skill.key + ">";
-		skillsByKey[skill.key] = skill;
-	}
-
-}
-
-
-function addMiscTags(keys) {
-	for (var i = 0; i < keys.length; i++) {
-		var s = keys[i];
-
-		var skill = {
-			name: s,
-			key: toCamelCase(s),
-			type: "misc"
-		}
-
-
-		allSkills.push(skill);
-		skills.misc.push(skill);
-
-
-		skillsByKey[skill.key] = skill;
+			list[i] += "<" + s + ">";
 	}
 }
 
 
-var paperTypes = [{
-	name: "poster",
-	shortName: "poster",
-	cost: 3,
-	length: 100,
-	hue: 20,
-}, {
-	name: "paper",
-	shortName: "paper",
-	cost: 10,
-	length: 400,
-	hue: 80,
-}, {
-	name: "journal article",
-	shortName: "article",
-	cost: 20,
-	length: 700,
-	hue: 170,
-}, {
-	name: "monograph",
-	shortName: "monograph",
-	cost: 100,
-	length: 1500,
-	hue: 250,
-}];
+
+var paperTypes = {
+
+	short: {
+		name: "short paper",
+		insight: "5",
+	},
+	long: {
+		name: "long paper",
+		insight: "10",
+	},
+	journal: {
+		name: "journal article",
+		insight: "20",
+	},
+}
 
 
-var hoursInADay = 1;
-
+var hoursInADay = 10;
+var speed = 10;
 var insightPerProgress = .01;
 var insightRamp = 1.5;
-var gameRate = 500;
 
-var qualityToText = ["slender ", "", "meaty "];
-var polishText = ["error-filled ", "very rough ", "rough ", "average", "polished ", "very polished", "flawless "];
 var types = ["content", "focus", "approach"];
-
-addTags(rawGrammar.approach_raw, "approach", true);
-addTags(rawGrammar.genre_raw, "focus", true, true);
-addTags(rawGrammar.game_raw, "focus", true);
-addTags(rawGrammar.content_raw, "content", true);
+addTags(rawGrammar.approach, "approach", true);
+addTags(rawGrammar.genre, "focus", true, true);
+addTags(rawGrammar.game, "focus", true);
+addTags(rawGrammar.content, "content", true);
 
 addTags(metaskills, "meta");
-addMiscTags(["taxonomies", "frameworks", "histories"]);
 skills.nonMeta = [].concat.apply([], [skills.approach, skills.focus, skills.content]);
-
-
-var tuning = {
-	chill: 1,
-	researching: 1,
-	writing: 1,
-	brainstorming: 10,
-}
-console.log(skillsByKey);

@@ -13,9 +13,7 @@ function createDiagramPlainNode(holder, value, type) {
 
 
 function createDiagram(node, holder, classes) {
-
-
-	//console.log(node);
+	
 	if (node === undefined || node === null) {
 
 		//	console.warn("No node to diagram!");
@@ -100,6 +98,8 @@ function createDiagram(node, holder, classes) {
 		class: "traceryparse-content",
 		//class: "traceryparse-content",
 	}).appendTo(div);
+
+
 	switch (node.type) {
 
 
@@ -312,7 +312,6 @@ function createDiagram(node, holder, classes) {
 			class: "traceryparse-errors",
 		}).appendTo(content);
 	}
-
 
 
 }
