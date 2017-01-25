@@ -6,7 +6,7 @@ html, body {
     color: DarkSlateGray;
     height: 100%;
    font-family: "Trebuchet MS", Helvetica, sans-serif;
-
+background-color: hsla(20, 10%, 30%, 1);
 }
 
 

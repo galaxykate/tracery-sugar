@@ -1,10 +1,14 @@
 /*
-// Railroad diagrams
 
-ParameterList::=  ((('"' Rule '"' | "'" Rule "'" | '[' RuleGenerator ']' | '(' Expression ')' | Expression) ) ( ',' ('"' Rule '"' | "'" Rule "'" | '[' RuleGenerator ']' | '(' Expression ')' | Expression))*)?
+Tag ::= "#" (Key|Path|"[" RuleGenerator"]") ("."(Key|Path)("("Expression ( ',' Expression)*  ")")?)* "#"
 
-Address ::=((("/" Key )+) | Key) ("(" ParameterList ")")?
-Key::= (("{" Rule "}")|(plaintext))+
+Action::= "[" Key ((":" RuleGenerator) |("::" RuleGenerator)  |(":""POP")  |(":""CLEAR")) | RuleGenerator"]"
+
+Path ::= ((("/" Key )+) | Key) 
+
+Key::= (("{" (Key|Path) "}")|(plaintext))+
+
+Expression ::= (Expression BinaryOperator Expression) | (UnaryOperator Expression) | Key "("  Expression ( ',' Expression)* ")" | "#" Key "#" | "#" Path "#" | '"' Rule '"' | "'" Rule "'" | '[' RuleGenerator ']' | '(' Expression ')'  | Key | Number
 */
 
 var tracery = (function() {
