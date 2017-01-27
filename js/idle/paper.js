@@ -14,102 +14,45 @@ var Paper = Entity.extend({
 		this.createView();
 		this.reroll();
 
+
 	},
 
 	setDetails: function() {
-
-this.polish = 0;
+		this.citations = 0;
+		this.isPublished = false;
 		var node = generateWithOverrides("paper", this.project.set, {
 			codeName: this.project.codeName
 		});
-		this.isComplete = false;
-		this.progress = 0;
+
 		var type = getRandom(types);
 		this.name = node.finished;
 		this.tags = this.getTagObjects(node.tags);
 
-		this.paperSize = this.paperType.length;
-		console.log(this.paperType, this.quality);
+		this.size = this.paperType.length;
 
-
-		this.updateCompleteness();
 	},
 
-	updateCompleteness: function() {
 
-		var completenessText = "unwritten";
-		if (this.progress / this.paperSize > .1)
-			completenessText = "draft";
-		if (this.isComplete) {
-			var lvl = Math.min(Math.pow(this.polish, .3), polishText.length - 1);
-			completenessText = polishText[Math.floor(lvl)];
-			if (lvl === polishText.length - 1)
-				lab.removeMeeplesAt(this);
+	setActivity: function(activity, target) {
+		if (activity === "review") {
+			this.announce(" submitted to " + target.nickname);
 		}
-
-
-		if (this.completenessText !== completenessText) {
-			this.completenessText = completenessText
-
-			this.view.activity.html(this.completenessText);
-			var hue = this.paperType.hue;
-
-
-			this.view.paperReadiness.html(this.completenessText + " ").css({
-				backgroundColor: "hsl(" + hue + ",50%, 90%)",
-				color: "hsla(" + hue + ",50%, 30%, " + (.3 + .1*lvl) + ")",
-			});
-
-			if (lvl > 5) {
-				this.view.paperReadiness.css({
-					"font-weight": "bold"
-				})
-			}
-
-
-
-			this.view.paperQuality.html(qualityToText[this.quality]).css({
-				backgroundColor: "hsl(" + hue + ",50%, 90%)",
-					color: "hsl(" + hue + ",50%, 30%)",
-		});
-			this.view.paperType.html(" " + this.paperType.name).css({
-				backgroundColor: "hsl(" + hue + ",50%,90%)",
-					color: "hsl(" + hue + ",50%, 30%)",
-		});;
-
-		}
-	},
-
-	setActivity: function(activity) {
 		this.view.activity.html(activity);
 	},
 
+	completeDraft: function() {
 
+		this.sockets.home = new Socket(this, {
+			label: "home",
+			type: "paper",
+			isHomeSocket: true,
+		});
+		this.meeple = new Meeple(this, "");
+	},
 
-	update: function(increment) {
-
-		this.progressBar.update(this.progress, this.tickProgress / increment);
-		this.tickProgress = 0;
-
-		if (!this.isComplete && this.progress > this.paperSize) {
-			this.announce(" completed");
-			this.isComplete = true;
-
-			this.polish = Math.random() * 5;
-
-			// Remove the progress bar and add a paper socket
-
-			this.sockets.home = new Socket(this, {
-				label: "home",
-				type: "paper",
-				isHomeSocket: true,
-			});
-			this.meeple = new Meeple(this, "");
-
-		}
-
-		this.updateCompleteness();
-
+	perfectDraft: function() {
+		lab.removeMeeplesAt(this);
+		this.sockets.write.remove();
 	},
 
 	addProgress: function(amt) {
@@ -121,6 +64,30 @@ this.polish = 0;
 		}
 	},
 
+	publish: function(pub) {
+		this.isPublished = true;
+		this.sockets.write.remove();
+		this.sockets.home.remove();
+		this.meeple.remove();
+		this.view.publication.html(" published in " + toSpan(pub));
+		this.setActivity("published");
+	},
+
+	update: function(increment) {
+		this._super(increment);
+		if (this.isPublished) {
+			if (Math.random() > .99)
+				this.getCitation();
+		}
+	},
+
+	getCitation: function() {
+		this.citations++;
+		this.announce(" has been cited");
+		lab.gainPrestige(Math.ceil(this.size * .01));
+
+		this.view.publication.html("citations: " + this.citationCount);
+	},
 
 	createView: function() {
 		var paper = this;
@@ -133,6 +100,14 @@ this.polish = 0;
 			class: "name dataelem"
 		}).appendTo(this.view.top);
 
+
+		this.view.publication = $("<div/>", {
+			class: "paper-stat"
+		}).appendTo(this.view.center);
+
+		this.view.citations = $("<div/>", {
+			class: "paper-stat"
+		}).appendTo(this.view.center);
 
 
 		this.view.reroll = $("<button/>", {
@@ -151,17 +126,16 @@ this.polish = 0;
 		}).appendTo(this.view.center);
 
 
-
-		this.view.paperReadiness = $("<span/>", {
+		this.view.progress = $("<span/>", {
 			class: "paper-stat"
 		}).appendTo(this.view.paperDetails);
 
-		this.view.paperQuality = $("<span/>", {
+		this.view.quality = $("<span/>", {
 			class: "paper-stat",
 
 		}).appendTo(this.view.paperDetails);
 
-		this.view.paperType = $("<span/>", {
+		this.view.type = $("<span/>", {
 			class: "paper-stat"
 		}).appendTo(this.view.paperDetails);
 
@@ -192,9 +166,19 @@ this.polish = 0;
 		console.log(this);
 		this.view.progressHolder.html("");
 
-		this.progressBar = new ProgressBar(this.view.progressHolder, "progress", this.paperSize);
+		this.progressBar = new ProgressBar(this.view.progressHolder, "progress", this.size);
 
 		this.view.name.html(this.name);
+		this.view.type.html(this.paperType);
 		this.updateTagView();
+	},
+
+
+	detailsToString: function() {
+		return this.quality + " " + this.level + " " + this.size + " " + this.tags.map(tag => tag ? tag.key : "");
+	},
+
+	toString: function() {
+		return inQuotes(this.name);
 	}
 });

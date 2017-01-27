@@ -49,7 +49,7 @@ function openPanel(id) {
 }
 $(document).ready(function() {
 
-	
+
 
 	console.log("HEY");
 	$(".slidersection").click(function() {
@@ -57,7 +57,7 @@ $(document).ready(function() {
 		$(this).addClass("open");
 	}).append();
 
-	openPanel("projects");
+	openPanel("whiteboard");
 
 	/*
 		popup(function(div) {
@@ -69,21 +69,23 @@ $(document).ready(function() {
 	lab = new Lab();
 
 
-	for (var i = 0; i < 3; i++) {
-		lab.people.push(new Researcher());
-	}
-
-
 	// Update loop
 	setInterval(function() {
 		if (!paused) {
 			// increment the day
-		lab.update(.2);
-
+			for (var i = 0; i < updatesPerTick; i++) {
+				lab.update(1/hoursInADay);
+			}
 		}
 	}, gameRate);
 });
 
+$(window).keypress(function(e) {
+	if (e.keyCode === 0 || e.keyCode === 32) {
+
+		paused = !paused;
+	}
+})
 
 
 function selectTagGroup(key) {
@@ -124,7 +126,7 @@ function popup(fillHtml, settings) {
 				}).appendTo(buttonHolder);
 
 				$.each(buttonSet, function(index, b) {
-					
+
 					var button = $("<button/>", {
 						html: b.name
 					}).appendTo(div).click(b.onClick);

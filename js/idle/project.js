@@ -7,45 +7,35 @@ var Project = Entity.extend({
 		this.id = projectCount++;
 		this.key = this.type + this.id;
 
-		this.hue =idea.hue;
+		this.hue = idea.hue;
 		this.sockets = {};
 		this.createView();
 		this.reroll();
 
 		this.papers = [];
 
-		this.addProgress(1000);
 		
-		for (var i = 0; i < 3; i++) {
-			var paper = this.createPaper(getRandom(paperTypes),Math.floor(Math.random(3)), 0);
-			paper.addProgress(1000);
-			
+		for (var i = 0; i < 0; i++) {
+			var paper = this.createPaper(getRandom(paperTypes), Math.floor(Math.random()*3));
 		}
-		
+	},
+
+	onAddProgress: function(amt, source) {
+		console.log("research progress " + source, amt);
+		this.insights += .01 * amt * (Math.pow(this.progess / this.size), 2);
 	},
 
 	update: function(increment) {
 
-		this.progressBar.update(this.progress, this.tickProgress / increment);
-		this.tickProgress = 0;
-
-		if (!this.completed && this.progress > this.projectSize) {
-			this.announce("completed");
-			// remove any meeples 
-			lab.removeMeeplesAt(this);
-			this.completed = true;
-
-		}
-
 		this.insightView.update(this.insights);
+		this._super(increment);
 	},
 
-	addProgress: function(amt) {
-		this.tickProgress += amt;
-		this.progress += amt;
-
-		this.insights += .01 * amt * (Math.pow(this.progess / this.projectSize), 2);
+	complete: function() {
+		lab.removeMeeplesAt(this);
+		this.sockets.research.remove();	
 	},
+
 
 	setDetails: function() {
 		this.progress = 0;
@@ -57,7 +47,7 @@ var Project = Entity.extend({
 		var project = this;
 		this.set = {};
 
-		this.projectSize = Math.floor(Math.random() * Math.random() * 20 + 10) * 100;
+		this.size = Math.floor(Math.random() * Math.random() * 20 + 10) * 100;
 
 		$.each(types, function(index, type) {
 			if (project.idea.set[type]) {
@@ -65,8 +55,7 @@ var Project = Entity.extend({
 			} else {
 				project.set[type] = getRandom(skills[type]);
 			}
-			console.log(type  + project.set[type].name + project.set[type].type);
-
+		
 		})
 
 
@@ -82,10 +71,8 @@ var Project = Entity.extend({
 	},
 
 	createPaper: function(type, quality, cost) {
-		console.log(type, quality);
-
+		
 		var paper = new Paper(this, type, quality);
-		paper.addProgress(5000);
 		this.papers.push(paper);
 		lab.papers.push(paper);
 
@@ -149,11 +136,11 @@ var Project = Entity.extend({
 		this.view = createViewDiv($("#projects .content"), "project", this).dblclick(function() {
 			project.createPaperPopup();
 		});
-		
-this.view.css({
-	backgroundColor: "hsl(" + this.hue + ",50%, 90%)",
-	border: "3px solid hsla(" + this.hue + ",50%, 50%, .2)"
-})
+
+		this.view.css({
+			backgroundColor: "hsl(" + this.hue + ",50%, 90%)",
+			border: "3px solid hsla(" + this.hue + ",50%, 50%, .2)"
+		})
 		this.makeDragDeletable();
 
 
@@ -202,7 +189,7 @@ this.view.css({
 		this.view.base.html("");
 		this.view.progressHolder.html("");
 
-		this.progressBar = new ProgressBar(this.view.progressHolder, "progress", this.projectSize, true);
+		this.progressBar = new ProgressBar(this.view.progressHolder, "progress", this.size, true);
 		this.view.papers = $("<div/>", {
 			class: "papers",
 		}).appendTo(this.view.base);

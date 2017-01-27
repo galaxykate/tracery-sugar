@@ -53,6 +53,10 @@ var Socket = Class.extend({
 				obj.reset();
 			});
 		}
+	},
+
+	remove: function() {
+		this.div.remove();
 	}
 });
 
@@ -118,11 +122,15 @@ var Meeple = Class.extend({
 		if (!label)
 			label = "home";
 
+
+
 		this.currentLocation = target;
 		this.currentLocationLabel = label;
 	
+	if (target.sockets[label])
 		target.sockets[label].div.append(this.div);
-
+else 
+	console.warn("No socket " + target + " " + label);
 		this.obj.setActivity(label, target);
 
 	},

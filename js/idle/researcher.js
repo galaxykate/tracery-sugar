@@ -56,16 +56,49 @@ var Researcher = Entity.extend({
 	},
 
 	update: function(increment) {
+		this._super(increment);
+
 		this.timeInDept += increment;
+
+		// self preservation
+
+		if (this.stress > (60 + 20 * Math.random()) && Math.random() > .9) {
+
+			this.reset();
+		}
+
+		// Do work
 		var bonus = 1;
 
 		var neighbors = lab.getAllResearchersWith(this.meeple);
+		var leaderBonus = 1;
+		for (var i = 0; i < neighbors.length; i++) {
+
+			if (neighbors[i].skills.leadership && this !== neighbors[i])
+				leaderBonus += neighbors[i].skills.leadership.level;
+		}
+		
+		if (this.meeple.currentLocationLabel !== "home") {
+			this.stress += tuning.stress * increment;
+
+			if (this.stress > 100) {
+				this.announce(" has dropped out of the department from stress");
+				this.remove();
+			}
+		}
+
+		//console.log(this.progress);
+		if (this.progress / this.timeInDept < .1 && this.timeInDept > 20) {
+
+			this.announce(" has dropped out of the department from frustration");
+			this.remove();
+		}
 
 		switch (this.meeple.currentLocationLabel) {
 			case "home":
 				if (this.skills.chilling)
 					bonus += this.skills.chilling.level;
-				this.stress = Math.max(0, this.stress - bonus * increment * tuning.chill);
+				this.stress = Math.max(0, this.stress - bonus * increment * tuning.chilling);
 				break;
 
 			case "study":
@@ -74,10 +107,9 @@ var Researcher = Entity.extend({
 				this.progress += bonus * increment;
 
 
-				this.studyProgress += bonus * increment * Math.random() * tuning.study;
+				this.studyProgress += bonus * increment * Math.random() * tuning.studying * leaderBonus;
 
-				console.log(this.studyProgress);
-				if (this.studyProgress > 100) {
+				if (this.studyProgress > 15) {
 					this.studyProgress = 0;
 					this.gainSkill(true);
 
@@ -87,19 +119,27 @@ var Researcher = Entity.extend({
 				if (this.skills.researching)
 					bonus += this.skills.researching.level;
 				var project = this.meeple.currentLocation;
-				project.addProgress(bonus * increment * tuning.research);
+
+				var skillBonus = 1;
+				for (var i = 0; i < project.tags.length; i++) {
+					var skill = this.skills[project.tags[i].key];
+					if (skill)
+						skillBonus += skill.level;
+				}
+
+
+				project.addProgress(bonus * increment * tuning.researching * skillBonus * leaderBonus, this);
 				break;
 
 			case "brainstorm":
 				if (this.skills.brainstorming)
 					bonus += this.skills.brainstorming.level;
-				lab.brainstormProgress += bonus * tuning.brainstorming;
+				lab.brainstormProgress += bonus * tuning.brainstorming * leaderBonus;
 
 				if (lab.brainstormProgress > 100) {
 					lab.brainstormProgress = Math.random() * 30;
 					// Come up with new idea
 					var allTags = [].concat.apply([], neighbors.map(s => s.getAllTags(true)));
-					console.log(allTags);
 					lab.ideas.push(new Idea(allTags));
 
 				}
@@ -109,7 +149,7 @@ var Researcher = Entity.extend({
 				if (this.skills.writing)
 					bonus += this.skills.writing.level;
 				var paper = this.meeple.currentLocation;
-				paper.addProgress(bonus * increment * 100);
+				paper.addProgress(bonus * increment * tuning.writing * leaderBonus, this);
 				break;
 			default:
 				console.warn(this.meeple.currentLocationLabel);
@@ -117,20 +157,6 @@ var Researcher = Entity.extend({
 		}
 
 
-		// Advancement
-		if (this.progress > progressLevels[this.progressLevel].limit) {
-			this.progressLevel++;
-			this.announce(" has " + progressLevels[this.progressLevel].announcement);
-
-			if (progressLevels[this.progressLevel].onEnter)
-				progressLevels[this.progressLevel].onEnter(this);
-		}
-
-		this.stress += increment;
-		if (this.stress > 100) {
-			this.announce(" has dropped out of the department");
-			lab.announce(" morale has gone down due to " + toSpan(this) + "'s departure");
-		}
 
 		this.stressView.update(this.stress);
 		this.timeView.update(this.timeInDept);
@@ -158,7 +184,6 @@ var Researcher = Entity.extend({
 		var key;
 
 		var v = Math.pow(Math.random(), 3) * 5;
-		console.log(v);
 		if (v < currentSkills.length) {
 			var key = getRandom(currentSkills);
 			this.skills[key].level++;
@@ -169,7 +194,6 @@ var Researcher = Entity.extend({
 				tag = getRandom(skills.meta);
 
 			var key = tag.key;
-			console.log("random skill " + key);
 			if (this.skills[key]) {
 				this.skills[key].level++;
 			} else {
@@ -285,37 +309,3 @@ function toSpan(s) {
 		color = "hsl(" + s.hue + ",80%, 40%)";
 	return "<span style='color:" + color + "' class='entityspan entityspan-" + s.type + "'>" + s.name + "</span>";
 }
-
-
-progressLevels = [{
-	announcement: "joined the lab",
-	limit: 15,
-}, {
-	announcement: "finished all required classes",
-	limit: 30,
-}, {
-	announcement: "advanced to candidacy",
-	limit: 40,
-}, {
-	announcement: "assembled a dissertation committee",
-	limit: 60,
-}, {
-	announcement: "finished a draft",
-	limit: 90,
-}, {
-	announcement: "scheduled a defense",
-	limit: 110,
-}, {
-	onEnter: function(researcher) {
-		researcher.isGraduated = true;
-		researcher.name = "Dr. " + researcher.name;
-		if (Math.random() > .1) {
-			researcher.remove();
-		} else {
-			researcher.announce(" has joined as a post-doc");
-		}
-		researcher.refreshView();
-	},
-	announcement: "graduated",
-	limit: 999999999,
-}];

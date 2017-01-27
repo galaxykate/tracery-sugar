@@ -31,7 +31,7 @@ border: "2px solid hsl(" + this.hue + ",50%, 50%)",
 	},
 
 	setDetails: function() {
-		console.log(this.sourceTags);
+		
 		var sourceSet = {};
 
 		for (var i = 0; i < types.length; i++) {
@@ -39,8 +39,7 @@ border: "2px solid hsl(" + this.hue + ",50%, 50%)",
 			var tags = this.sourceTags.filter(s => s.type === type);
 			sourceSet[type] = [getRandom(skills[type])].concat(tags).concat(tags);
 		}
-		console.log(sourceSet);
-
+	
 		this.set = {
 			focus: getRandom(sourceSet.focus),
 			approach: getRandom(sourceSet.approach),
@@ -48,12 +47,12 @@ border: "2px solid hsl(" + this.hue + ",50%, 50%)",
 		};
 
 		this.getTagsFromSet();
-		console.log(this.tags);
+		
 		this.name = generateWithOverrides("idea", undefined, {
 			a: this.tags[0].name,
 			b: this.tags[1].name
 		}).finished;
-		console.log(this.name);
+		
 
 	},
 

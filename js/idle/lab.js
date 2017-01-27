@@ -12,17 +12,18 @@ var Lab = Entity.extend({
 
 		this.sockets = {};
 
-
-		this.papers = [];
-		this.people = [];
-		this.ideas = [];
-		this.projects = [];
-		this.publications = [];
-
-
 		this.createView();
+
 		this.reroll();
-		this.update();
+
+		for (var i = 0; i < 5; i++) {
+			this.update();
+		}
+
+	},
+
+	gainPrestige: function(amt) {
+		this.prestige += amt;
 	},
 
 	getAllResearchersWith: function(meeple) {
@@ -33,26 +34,43 @@ var Lab = Entity.extend({
 	},
 
 	getPapersAt: function(conf) {
-		var papers = this.papers.filter(paper => paper.meeple.currentLocation === conf);
-		console.log(papers);
+		var papers = this.papers.filter(paper => paper.meeple ? paper.meeple.currentLocation === conf : false);
 		return papers;
 	},
 
 	removeMeeplesAt: function(entity) {
 		for (var i = 0; i < this.people.length; i++) {
-			if (this.people[i].meeple.currentLocation === entity) {
+			if (this.people[i].meeple && this.people[i].meeple.currentLocation === entity) {
 				this.people[i].reset();
 			}
 		}
 
 		for (var i = 0; i < this.papers.length; i++) {
-			if (this.papers[i].meeple.currentLocation === entity) {
+			if (this.papers[i].meeple && this.papers[i].meeple.currentLocation === entity) {
 				this.papers[i].reset();
 			}
 		}
 	},
 
 	setDetails: function() {
+		
+		$("#announcements").html("");
+		$("#people").html("");
+		$("#projects .content").html("");
+		$("#whiteboard .content").html("");
+		$("#calendar .content").html("");
+		$(".meeple").remove();
+
+
+console.log("reroll " + this);
+
+		this.papers = [];
+		this.people = [];
+		this.ideas = [];
+		this.projects = [];
+		this.publications = [];
+
+		this.view.name.html(this.name);
 
 		this.announce("A CFP game for <a href='http://www.cig2017.com/'>Computational Intelligence in Games", true);
 		this.announce("Deadlines:", true);
@@ -67,25 +85,19 @@ var Lab = Entity.extend({
 		this.prestige = 1;
 		this.day = 1;
 
-		for (var i = 0; i < 5; i++) {
-			this.ideas.push(new Idea([]));
-		}
-		for (var i = 0; i < 5; i++) {
-			this.projects.push(new Project(getRandom(this.ideas)));
-		}
-
-		for (var i = 0; i < 5; i++) {
-			this.publications.push(new Publication(i * 20 + Math.random() * 10 + 10));
-		}
-
-
+	
 	},
 
 	update: function() {
-		console.log("update " + this.day);
+
+
+
 		var increment = 1 / hoursInADay;
 		this.day += increment;
 
+		if (lab.people.length < 3 + .2 * Math.pow(this.prestige, .2)) {
+			lab.people.push(new Researcher());
+		}
 
 
 		$.each(lab.people, function(index, researcher) {
@@ -107,29 +119,87 @@ var Lab = Entity.extend({
 
 
 		if (this.publications.length < 5) {
-			this.publications.push(new Publication(this.day + 60));
+			this.publications.push(new Publication(this.day + 90 + Math.random()*10));
 		}
 
 
-		if (this.day < 3) {
-			console.log("send out papers");
-
-			for (var i = 0; i < this.papers.length; i++) {
-
-				this.papers[i].meeple.moveTo(this.publications[0], "review");
-			}
-
-		}
 		this.dayView.update(this.day);
 
-		this.moraleView.update(this.morale);
+		//		this.moraleView.update(this.morale);
 		this.prestigeView.update(this.prestige);
+
+		this.automove();
+		this.publications = this.publications.filter(s => !s.isDeleted);
+		this.projects = this.projects.filter(s => !s.isDeleted);
+		this.papers = this.papers.filter(s => !s.isDeleted);
+		this.people = this.people.filter(s => !s.isDeleted);
+		this.ideas = this.ideas.filter(s => !s.isDeleted);
+	},
+
+	// Automatically manage the lab
+	automove: function() {
+
+
+		for (var i = 0; i < this.people.length; i++) {
+			var p = this.people[i];
+
+
+			// Make a move, maybe
+			if (Math.random() > .8 && p.stress < 50 && p.meeple.currentLocationLabel === "home") {
+
+
+				// work on a random paper
+				var paper = getRandom(this.papers);
+				if (paper && Math.random() > .5)
+					p.meeple.moveTo(paper, "write");
+
+
+				var project = getRandom(this.projects);
+				if (project && Math.random() > .5)
+					p.meeple.moveTo(project, "research");
+				else {
+					if (Math.random() > .5 && lab.ideas.length < 5)
+						p.meeple.moveTo(lab, "brainstorm");
+					else
+						p.meeple.moveTo(lab, "study");
+				}
+
+
+			}
+		}
+		for (var i = 0; i < this.papers.length; i++) {
+
+
+			var p = this.papers[i];
+
+			if (p.meeple && p.meeple.currentLocationLabel === "home" && Math.random() > .99999) {
+				//console.log(p + " is idle");
+
+
+				// find all matching conferences and their expected review score
+				var pairings = this.publications.filter(pub => pub.canAccept(p)).map(function(pub) {
+					return {
+						pub: pub,
+						score: (pub.score(p) + 2) * .5 * (pub.quality + 1) - pub.daysRemaining * .09
+					}
+				});
+				if (pairings.length > 0) {
+					pairings.sort(function(a, b) {
+						return b.score - a.score;
+					});
+					p.meeple.moveTo(pairings[0].pub, "review");
+				}
+			}
+
+
+		}
+
+
 	},
 
 
 	createView: function() {
-		var lab = this;
-
+		
 		this.view = createViewDiv($("#lab-data"), "researcher", this, true);
 
 		this.view.name = $("<div/>", {
@@ -154,10 +224,27 @@ var Lab = Entity.extend({
 
 		this.dayView = new ValueView(this.view.stats, "day", true);
 
-		this.moraleView = new ValueView(this.view.stats, "morale", true);
+		//this.moraleView = new ValueView(this.view.stats, "morale", true);
 		this.prestigeView = new ValueView(this.view.stats, "prestige", true);
 
+		this.view.reset = $("<button/>", {
+			class: "reset",
+			html: "X"
+		}).appendTo(this.view.top).click(function() {
+			var settings = {
+				onYes: function() {
+					lab.reroll();
+				},
+				onNo: function() {
+					console.log("Cancel");
+				}
+			};
 
+			popup(function(div) {
+
+				div.append("Restart? You will lose all progress and students")
+			}, settings);
+		});
 
 		this.view.bottom.css({
 			textAlign: "center"
@@ -185,6 +272,6 @@ var Lab = Entity.extend({
 
 	},
 	refreshView: function() {
-		this.view.name.html(this.name);
+
 	}
 });

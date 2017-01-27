@@ -7,17 +7,78 @@ var Entity = Class.extend({
 		selected = this;
 	},
 
+	addProgress: function(amt, source) {
+		this.progress += amt;
+		this.tickProgress += amt;
+		if (this.onAddProgress)
+			this.onAddProgress(amt, source);
+	},
+
+	gainLevel: function() {
+		this.level++;
+		console.log(this.name + " gain level ");
+		if (progressLevels[this.type]) {
+			var lvl = progressLevels[this.type][this.level];
+			if (lvl.onEnter)
+				lvl.onEnter(this);
+			if (lvl.announcement)
+				this.announce(lvl.announcement);
+			if (lvl.label)
+				this.setLabel(lvl.label);
+
+
+
+		}
+	},
+
+
+	update: function(increment) {
+		
+		// get the current level
+		var lvls = progressLevels[this.type];
+		if (lvls && lvls[this.level + 1] !== undefined) {
+			var nextLevel = lvls[this.level + 1];
+		
+			var limit = nextLevel.limit;
+			if (this.size)
+				limit *= this.size;
+
+			if (limit <= this.progress) {
+
+				this.gainLevel();
+			}
+		}
+		if (this.progressBar)
+			this.progressBar.update(this.progress, this.tickProgress);
+
+		this.tickProgress = 0;
+
+
+	},
+
+	setLabel: function(label) {
+		this.label = label;
+		if (this.view.progress) {
+			var pct = this.level / progressLevels[this.type][progressLevels[this.type].length - 1].limit;
+			var hue = 300 - 200 * pct;
+			this.view.progress.html(this.label).css({
+				backgroundColor: "hsl(" + hue + ",50%, 90%)",
+				color: "hsla(" + hue + ",50%, 30%, " + (.3 + .7 * pct) + ")",
+			});
+		}
+	},
+
 	announce: function(announcement, noPrefix) {
-		console.log(this.name + announcement);
 
 		var s = "<div class='announcement'>" + toSpan(this) + announcement + "</div>";
 		if (noPrefix)
 			s = "<div class='announcement'>" + announcement + "</div>";
-		if (this.view.announcements) {
-			this.view.announcements.append(s);
-		} else {
-			lab.view.announcements.append(s);
-		}
+		lab.view.announcements.append(s);
+		lab.view.announcements.stop().animate({
+			scrollTop: lab.view.announcements[0].scrollHeight
+		}, 200);
+
+		//	$("#mydiv").scrollTop($("#mydiv")[0].scrollHeight);
 	},
 
 	remove: function() {
@@ -38,6 +99,11 @@ var Entity = Class.extend({
 	},
 
 	reroll: function() {
+		this.progress = 0;
+		this.level = -1;
+		this.tickProgress = 0;
+		this.gainLevel();
+
 		this.setDetails();
 
 		this.refreshView();
@@ -60,7 +126,7 @@ var Entity = Class.extend({
 
 			}
 			return skillsByKey[key];
-		});
+		}).filter(s => s !== undefined);
 	},
 
 	updateTagView: function() {
@@ -68,16 +134,20 @@ var Entity = Class.extend({
 		// update tag view
 		var obj = this;
 		this.view.tags.html("");
-		$.each(this.tags, function(index, tag) {
-			var tagDiv = $("<div/>", {
-				html: tag.name,
-				class: "tag" + " tag-" + tag.key + " tag-" + tag.type,
-			}).appendTo(obj.view.tags).click(function() {
 
-				selectTagGroup(tag.key);
-				event.stopPropagation();
-			});
+		$.each(this.tags, function(index, tag) {
+			if (tag !== undefined) {
+				var tagDiv = $("<div/>", {
+					html: tag.name,
+					class: "tag" + " tag-" + tag.key + " tag-" + tag.type,
+				}).appendTo(obj.view.tags).click(function() {
+
+					selectTagGroup(tag.key);
+					event.stopPropagation();
+				});
+			}
 		});
+
 	},
 
 
@@ -100,7 +170,7 @@ var Entity = Class.extend({
 			stop: function() {
 
 				var xPos = $(this).offset().left;
-				console.log(xPos);
+
 				if (Math.abs(xPos > limit * .6)) {
 					$(this).addClass("toDelete");
 					obj.view.animate({

@@ -1,14 +1,37 @@
 var rawGrammar = {
 
+	vapid: ["lacking in #goodThing#", "full of #badThing#", "vapid", "careless", "ignorant", "poorly-formatted", "misspelled", "unclear", "uninsightful", "overly-simplistic", "basic", "elementary", "obfuscated", "unfocused", "trivial"],
+	clever: ["clever", "clear", "insightful", "interesting", "relevant", "timely", "of interest to the community", "balanced", "novel", "well-researched", "focused"],
+	badThing: ["errors", "typos", "misquotations", "factual errors", "layout issues", "oversights", "bad methodology"],
+
+	goodThing: ["insight", "merit", "contribution", "writing", "equations", "citations", "graphics", "graphs", "evaluation", "good methodology", "references", "historicity", "related work"],
+	somewhat: ["rather", "somewhat", "mostly", "largely"],
+	completely: ["catastrophically", "completely", "absolutely", "very", "frighteningly", "dreadfully", "shockingly", "amazingly"],
+	flawed: ["minimal", "insufficient", "could use more", "lack of", "missing", "no", "absent", "lacks", "not enough"],
+	great: ["amazing", "insightful", "strong", "perceptive", "astute", "creative"],
+	fullOf: ["full of", "recurring", "too many", "excessive"],
+	personalReject: ["conflicts with my own findings", "conflicts with findings of #reviewPerson#", "the findings are not #clever#", "I would have used #approach_raw#", "#focus_raw# would have made a more #clever# domain", "the topic is not #clever#"],
+
+	number: ["1", "2", "3", "4", "6"],
+	year: ["198#number#", "197#number#", "9#number#", "200#number#", "201#number#"],
+	reviewPerson: ["Dr. #lastName#", "#lastName# #year#", "#lastName# and #lastName# (#year#)", "this reviewer"],
+	alreadyDone: ["already done by #reviewPerson#", "repeats earlier work by #reviewPerson#", "should cite #reviewPerson#"],
+
+	accept1: ["#clever#, #clever#, #clever#", "#completely# #clever#", "#great# #goodThing#, #great# #goodThing#"],
+	accept0: ["#somewhat# #clever#", "#clever# and #clever#", "#clever# and #fullOf# #goodThing#"],
+	borderline: ["#vapid# but #somewhat# #clever#", "#clever# but #somewhat# #vapid#", "#clever#, #fullOf# #badThing#"],
+	reject0: ["#somewhat# #vapid#", "#vapid# and #vapid#", "#flawed# #goodThing#"],
+	reject1: ["#completely# #vapid", "#flawed# #goodThing#", "#personalReject#", "#vapid# and #completely# #vapid#", "#completely# #fullOf# #badThing#", "#alreadyDone#"],
+
 	whiteboardSuccess: ["?", "???", "X", "(papers)", "GRANTZ!", "$$$", "!", "win", "yes", "MAYBE"],
 	idea: ["#a# and #b#", "#a# & #b#", "#a# & #b#->#whiteboardSuccess#", "#a# + #b# = #whiteboardSuccess#", "#a# -> #b# -> #whiteboardSuccess#", "1. #a# 2. #b# 3. #whiteboardSuccess#", "#b#, but #for# #a#"],
 
 	genre_raw: ["ARG", "dating sim", "pet simulator", "farming simulator", "idlegame", "soap opera", "roguelike", "survival horror game", "MetroidVania", "text adventure", "tactical RPG", "social game", "horror game", "slot machine", "MMO", "card game", "stealth game", "puzzle game", "walking simulator", "board game", "fighting game", "eurogame", "simulation game", "flight simulator", "MOBA", "tower defense", "LARP", "trivia game", "incremental game", "rail shooter", "real-time strategy game", "exergame", "racing sim", "advergame", "serious game", "Match-3", "imperfect information game", "therapy game", "survival game", "tabletop RPG", "Twine game", "visual novel", "physics platformer", "first-person shooter", "stealth game", "JRPG", "pinball"],
 	game_raw: ["VR", "augmented reality", "Goat Simulator", "Neko Atsume", "Frog Fractions", "Monument Valley", "Undertale", "online poker", "interactive fiction", "chess", "poker", "Stardew Valley", "Street Fighter", "Overwatch", "Minecraft", "FIFA 16", "Skyrim", "Tony Hawk's Pro Skater", "Pong", "NBA Jam", "Counter-Strike", "Spelunky", "Cookie Clicker", "Bejeweled", "Settlers of Catan", "Candy Crush", "Risk", "Dwarf Fortress", "the Sims 4", "Ms Pac Man", "Tetris", "SimCity", "Sokoban", "Rogue", "StarCraft", "Monkey Island II", "SimCity", "Rock Band", "Go", "League of Legends", "Hearthstone", "Magic the Gathering", "Pokemon Go", "Civilization V", "Eve Online", "Super Mario Bros"],
 
-	content_raw: ["content", "music", "navigation", "physics", "physics puzzles", "humor", "character creators", "user creativity", "emotional affect", "deck building", "color palettes", "weapons", "emergent behavior", "textures", "trees", "level layout", "obstacle placement", "matchmaking", "dialog trees", "quests", "minigames", "skill trees", "art styles", "shaders", "characters", "tutorials", "landscapes", "narrative", "rule-sets", "behavior", "tactics", "long-term strategy", "teammates", "enemies", "traps", "competitions", "evaluation metrics", "NPC behavior", "love triangles", "crafting recipes", "crafting system", "navmeshes", "relationships", "weapons", "quests", "dialogue", "difficulty curves", "difficulty", "matchmaking", "emotional affect", "maps", "terrain", "skyboxes", "interiors", "flavor text", "stories", "drama", "suspense", "audio"],
+	content_raw: ["content", "music", "navigation", "physics", "physics puzzles", "humor", "character creators", "user creativity", "emotional affect", "deck building", "color palettes", "weapons", "emergent behavior", "textures<graphics>", "vegetation<graphics>", "level layout", "obstacle placement", "matchmaking", "dialog trees", "quests", "minigames", "skill trees", "art styles<graphics>", "shaders<graphics>", "characters", "tutorials", "landscapes", "storylines<narrative>", "character<narrative>", "rule-sets", "behavior", "tactics", "long-term strategy", "teammates", "enemies", "traps", "competitions", "evaluation metrics", "NPC behavior", "love triangles", "crafting recipes", "crafting system", "navmeshes", "relationships", "weapons", "quests", "dialogue<narrative>", "difficulty curves", "difficulty", "matchmaking", "emotional affect", "maps", "terrain", "skyboxes", "interiors", "flavor text", "stories", "drama", "suspense", "audio"],
 
-	approach_raw: ["simple tree search", "A*", "GOAP", "grammar induction", "finite state machines", "deep learning", "constraint solving", "search", "simulated annealing", "genetic programming", "fuzzy logic", "decision networks", "hill-climbing", "classifiers", "multilayer perceptrons", "RNNs", "gradient descent", "knowledge representation", "regret-based optimization", "neural networks", "Markov Chains", "social intelligence", "crowdsourcing", "Monte Carlo tree search", "imitative learning", "swarm intelligence", "multi-agent planning", "reinforcement learning", "case-based reasoning", "Bayesian models", "opponent modelling", "adversarial planning", "Monte Carlo planning", "benchmarks", "stochastic AI", "NLP", "pathfinding", "situated approaches", "clustering", "expert systems", "evolutionary algorithms", "mixed initiative interfaces", "finite state machines", "genetic algorithms", "behavior trees", "LSTMs", "topological mapping", "grammars", "grammatical evolution"],
+	approach_raw: ["simple tree search", "A*", "GOAP", "grammar induction", "finite state machines", "deep learning", "constraint solving", "search", "simulated annealing", "genetic programming<evolution>", "fuzzy logic", "decision networks", "hill-climbing", "classifiers", "multilayer perceptrons", "RNNs", "gradient descent", "knowledge representation", "regret-based optimization", "neural networks", "Markov Chains", "social intelligence", "crowdsourcing", "Monte Carlo tree search", "imitative learning", "swarm intelligence", "multi-agent planning", "reinforcement learning", "case-based reasoning", "Bayesian models", "opponent modelling", "adversarial planning", "Monte Carlo planning", "benchmarks", "stochastic AI", "NLP", "pathfinding", "situated approaches", "clustering", "expert systems", "evolutionary algorithms<evolution>", "mixed initiative interfaces", "finite state machines", "genetic algorithms<evolution>", "behavior trees", "LSTMs", "topological mapping", "grammars", "grammatical evolution<evolution>"],
 
 
 	randomAcronym: [],
@@ -24,8 +47,8 @@ var rawGrammar = {
 
 	project: ["#codeName.capitalize#: #approach# for #focus# #content#"],
 
-	verb_present: ["predict", "evolve", "generate", "evaluate", "benchmark", "build", "model", "plan", "analyze", "learn"],
-	verb: ["predicting", "evolving", "generating", "evaluating", "benchmarking", "building", "modelling", "analyzing", "learning"],
+	verb_present: ["predict", "evolve<evolution>", "generate", "evaluate<evaluation>", "benchmark", "build", "model", "plan", "analyze", "learn"],
+	verb: ["predicting", "evolving<evolution>", "generating", "evaluating<evaluation>", "benchmarking", "building", "modelling", "analyzing", "learning"],
 	adj: ["novel", "expressive", "meaningful", "real", "deep", "simulated", "human-level", "rule-based", "integrated", "real-time", "personalized", "flexible", "augmented", "affective", "adaptive", "reactive", "dynamic", "procedural", "generative"],
 	adj_science: ["rapid", "quick", "accurate", "decisive", "impactful", "efficient", "concurrent", "parallel"],
 
@@ -45,23 +68,23 @@ var rawGrammar = {
 	for: ["in", "for", "with"],
 
 
-
+	randomTag: ["<theory>", "<applications>", "<postmortems>", "<commercial>", "", "", ""],
 	paper: [
-		"Comparing #approach# and #approach_raw# for #adj# #content#",
-		"#approach.capitalize# #for# #focusPlural#: #adj.a# #work#",
-		"#approach.capitalize# #for# #focusPlural#: #work.a#",
-		"#approach.capitalize# #for# #focusPlural#: #work.a# with #codeName#",
+		"Comparing #approach# and #approach_raw# for #adj# #content##randomTag#",
+		"#approach.capitalize# #for# #focusPlural#: #adj.a# #work##randomTag#",
+		"#approach.capitalize# #for# #focusPlural#: #work.a##randomTag#",
+		"#approach.capitalize# #for# #focusPlural#: #work.a# with #codeName##randomTag#",
 
 		"#codeName#: #regular_paper.capitalize#",
-		"#codeName#: #regular_paper.capitalize#",
+		"#codeName#: #regular_paper.capitalize##randomTag#",
+		"#codeName#: #regular_paper.capitalize##randomTag#",
+		"#codeName#: #regular_paper.capitalize##randomTag#",
+		"#regular_paper.capitalize##randomTag#",
 		"#codeName#: #regular_paper.capitalize#",
 		"#codeName#: #regular_paper.capitalize#",
 		"#regular_paper.capitalize#",
-		"#codeName#: #regular_paper.capitalize#",
-		"#codeName#: #regular_paper.capitalize#",
-		"#regular_paper.capitalize#",
-		"#regular_paper.capitalize#",
-		"#regular_paper.capitalize#",
+		"#regular_paper.capitalize##randomTag#",
+		"#regular_paper.capitalize##randomTag#",
 		"#regular_paper.capitalize#",
 		"#approach.capitalize# #for# #adj# #focusPlural#: #work.a#",
 
@@ -264,15 +287,7 @@ var paperTypes = [{
 	hue: 250,
 }];
 
-
-var hoursInADay = 1;
-
-var insightPerProgress = .01;
-var insightRamp = 1.5;
-var gameRate = 500;
-
 var qualityToText = ["slender ", "", "meaty "];
-var polishText = ["error-filled ", "very rough ", "rough ", "average", "polished ", "very polished", "flawless "];
 var types = ["content", "focus", "approach"];
 
 addTags(rawGrammar.approach_raw, "approach", true);
@@ -281,14 +296,108 @@ addTags(rawGrammar.game_raw, "focus", true);
 addTags(rawGrammar.content_raw, "content", true);
 
 addTags(metaskills, "meta");
-addMiscTags(["taxonomies", "frameworks", "histories"]);
+addMiscTags(["taxonomies", "frameworks", "evaluation", "graphics", "sound", "narrative", "histories", "theory", "applications", "postmortems", "commercial", "evolution"]);
 skills.nonMeta = [].concat.apply([], [skills.approach, skills.focus, skills.content]);
 
 
+
+var progressLevels = {
+	researcher: [{
+		label: "PhD student",
+		}, {
+		announcement: " finished all required classes",
+		limit: 30,
+	}, {
+		label: "PhD candidate",
+		announcement: " advanced to candidacy",
+		limit: 40,
+	}, {
+		announcement: " assembled a dissertation committee",
+		limit: 60,
+	}, {
+		announcement: " finished a dissertation draft",
+		limit: 90,
+	}, {
+		announcement: "scheduled a dissertation defense",
+		limit: 110,
+	}, {
+		label: "doctor",
+		onEnter: function(researcher) {
+			console.log("GRADUATE");
+			researcher.isGraduated = true;
+			lab.gainPrestige(20);
+			lab.announce("has gained prestige from " + toSpan(researcher) + "'s graduation");
+			researcher.name = "Dr. " + researcher.name;
+			if (Math.random() > .3) {
+				researcher.remove();
+			} else {
+				researcher.announce(" has joined as a post-doc");
+			}
+
+			researcher.refreshView();
+		},
+		announcement: " has graduated!",
+		limit: 120,
+	}],
+
+
+	project: [{
+		announcement: " started",
+	}, {
+		limit: 1,
+		onEnter: project => project.complete(),
+		announcement: " finished",
+	}],
+
+	paper: [{
+		label: "in progress",
+		announcement: " draft started",
+	}, {
+		label: "draft",
+		limit: 1,
+		announcement: " draft finished",
+		onEnter: paper => paper.completeDraft()
+	}, {
+		label: "error-filled",
+		limit: 1.5,
+	}, {
+		label: "very rough",
+		limit: 2,
+	}, {
+		label: "rough",
+		limit: 2.5,
+	}, {
+		label: "average",
+		limit: 3,
+	}, {
+		label: "polished",
+		limit: 3.5,
+	}, {
+		label: "very polished",
+		limit: 4,
+	}, {
+		label: "flawless",
+		limit: 5,
+		onEnter: paper => paper.perfectDraft()
+	}]
+};
+
+
+
+var hoursInADay = 10;
+
+var updatesPerTick = 60;
+
+var insightPerProgress = .01;
+var insightRamp = 1.5;
+var gameRate = 400;
+
 var tuning = {
-	chill: 1,
+	chilling: 1,
 	researching: 1,
 	writing: 1,
-	brainstorming: 10,
+	studying: .6,
+	brainstorming: 19,
+	stress: 2,
 }
 console.log(skillsByKey);
