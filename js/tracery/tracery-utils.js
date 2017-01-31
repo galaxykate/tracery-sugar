@@ -406,7 +406,6 @@ function parseExpression(raw) {
 					return parseRuleGenerator(inner);
 
 				case "(":
-					console.log("inner expression", inner);
 					return parseExpression(inner);
 
 				case undefined:
@@ -480,6 +479,23 @@ function parseTag(s) {
 }
 
 function parseRule(rawRule, protected) {
+	nodeParses++;
+
+
+	if (rawRule.search(/[#\{\(\[]/) < 0) {
+		var val = parseFloat(rawRule);
+		if (!isNaN(val)) {
+			return {
+				type: "number",
+				finished: val
+			}
+		} else {
+			return {
+				type: "text",
+				finished: rawRule
+			}
+		}
+	}
 	var rule = {
 
 		raw: rawRule,

@@ -7,6 +7,9 @@ Address ::=((("/" Key )+) | Key) ("(" ParameterList ")")?
 Key::= (("{" Rule "}")|(plaintext))+
 */
 
+var nodeExpansions = 0;
+var nodeParses = 0;
+
 var tracery = (function() {
 	function TraceryGrammar(raw) {
 
@@ -70,10 +73,11 @@ var tracery = (function() {
 
 
 	TraceryGrammar.prototype.pushRules = function(key, rules, state) {
-		//console.log(rules);
 		if (!state.stacks[key])
 			state.stacks[key] = [];
-		state.stacks[key].push(new TraceryRuleset(key, rules));
+
+		var ruleset = new TraceryRuleset(key, rules);
+		state.stacks[key].push(ruleset);
 	};
 
 	// Stomp rules
@@ -128,6 +132,7 @@ var tracery = (function() {
 
 	// Expand a node
 	TraceryGrammar.prototype.expandNode = function(node, parent, state) {
+		nodeExpansions++;
 		var grammar = this;
 		if (node === undefined)
 			throw ("empty node");
@@ -256,6 +261,7 @@ var tracery = (function() {
 						// For each rule value, generate the rules
 					case "rg-for":
 
+
 						var generatedRules = [];
 
 						// Expand all the rules of the for loops
@@ -268,7 +274,6 @@ var tracery = (function() {
 						}
 
 
-						var currentValues = {};
 
 						// For each variant in the loops, push those rules, then do all the templates, then pop
 						function makeTemplates(loopIndex) {
@@ -276,13 +281,12 @@ var tracery = (function() {
 
 							// All the rules to iterate through
 							var rules = loop.source.generatedRules;
-
+							
 							// For each possible rule, generate expansions with the other loops' values
 							for (var i = 0; i < rules.length; i++) {
 								var key = loop.key.key;
 
 								grammar.pushRules(key, rules[i], state);
-								currentValues[key] = rules[i];
 
 								// recurse
 								if (loopIndex < node.loops.length - 1) {
@@ -290,27 +294,20 @@ var tracery = (function() {
 								}
 								// Otherwise, generate the rules
 								else {
-									var s = "";
-									$.each(currentValues, function(key, val) {
-										s += key + ":" + val + "\t";
-									});
 
 									// We're going to be filling a template, with some values
-
 									grammar.expandNode(node.templateExpression, node, state);
-
 									generatedRules.push(node.templateExpression.finished);
 								}
 
-								grammar.popRules(node.address, state);
+								grammar.popRules(key, state);
 							}
 
 						}
 
 						makeTemplates(0);
 						node.generatedRules = generatedRules;
-
-
+						
 						break;
 
 						// Concatenate rule sets
@@ -470,7 +467,6 @@ var tracery = (function() {
 
 								break;
 							case "address":
-								console.log(section);
 								if (section.isFunction) {
 									var result = section.finishedTarget.apply(null, section.finishedParameters);
 									section.finished = result;
@@ -551,6 +547,7 @@ var tracery = (function() {
 							this.expandNode(node.rule, node, state);
 							node.innerFinished = node.rule.finished;
 							node.tags = node.rule.tags;
+
 						}
 
 
@@ -650,14 +647,12 @@ var tracery = (function() {
 							// This may be either a "player", "5", "player{player.foo}",
 							// or a path in itself "/player/{/stats/topPlayer}/5"
 							this.expandNode(node.path[i], node, state);
-							console.log(node.path[i]);
 							if (node.path[i].key !== undefined)
 								node.finishedPath.push(node.path[i].key);
 							else
 								node.finishedPath.push(node.path[i].finished);
 						}
-						console.log(node.finishedPath);
-
+						
 						// Use a custom access function
 						if (state.worldObject.getFromPath) {
 							node.finishedTarget = state.worldObject.getFromPath(node.finishedPath);
@@ -733,7 +728,6 @@ var tracery = (function() {
 				grammar.expandNode(node.parameters[i], node, state);
 			}
 		}
-
 		return node;
 	};
 
@@ -764,12 +758,30 @@ var tracery = (function() {
 
 	TraceryRuleset.prototype.getRule = function(node) {
 		// TODO, shuffles, weights, and conditionals
+
+
 		var index = Math.floor(Math.random() * this.rules.length);
-		var rule = this.rules[index];
-		var parsed = parseRule(rule);
+
+		// Just a number?
+		if (!isNaN(this.rules[index])) {
+			this.rules[index] = {
+				type: "number",
+				finished: this.rules[index]
+			}
+		}
+
+		if (isString(this.rules[index])) {
+
+
+			this.rules[index] = parseRule(this.rules[index]);
+		}
+
+
+		var parsed = Object.assign({}, this.rules[index]);
 
 		parsed.ruleIndex = index;
 		parsed.options = this.rules;
+
 		return parsed;
 	};
 
@@ -904,7 +916,6 @@ var tracery = (function() {
 					capitalize: function(s) {
 						var s2 = s.charAt(0).toUpperCase() + s.substring(1);
 						return s2;
-						console.log(capitalize);
 					},
 
 					a: function(s) {
@@ -1056,7 +1067,6 @@ var tracery = (function() {
 
 			if (i < path.length - 1) {
 				if (obj2[next] === undefined) {
-					console.log("Create property " + inQuotes(next));
 					obj2[next] = {};
 				}
 			}
