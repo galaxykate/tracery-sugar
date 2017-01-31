@@ -6,7 +6,8 @@ function testTracery() {
 	//'#emoji##name#' for a in /emojiTable [emoji:a/emoji][name:a/name] ''
 	//"'#myNum##animal#' for myNum in number", "'#myNum##myAnimal#' for myNum in number for myAnimal in animal",
 	var tests = {
-		rule: ["[/names/british/female]", "#/names/british/female/3#", "foo", "\\\\\\foo", "foo#bar#", "#animalName.capitalize.s#", "foo#missingSymbol#", "foo[bar]", "foo[#bar#]", "[#animalName.replace([vowel],'X')#]", "[range(0,4,5)]", "[join([range(0,4,5)],',')]", "[doSomethingWithNoReturn(#foo#)]", "foo\\#bar\\#", "\\[foo{#'\\]", "(#foo#)", "!صَبَاحُ الخَيْر", "בוקר טוב.", "早上好", "I 💖 emoji🏄🏾"],
+	//	rule: ["[/names/british/female]", "#/names/british/female/{/indices/2}#", "foo", "\\\\\\foo", "foo#bar#", "#animalName.capitalize.s#", "foo#missingSymbol#", "foo[bar]", "foo[#bar#]", "[#animalName.replace([vowel],'X')#]", "[range(0,4,5)]", "[join([range(0,4,5)],',')]", "[doSomethingWithNoReturn(#foo#)]", "foo\\#bar\\#", "\\[foo{#'\\]", "(#foo#)", "!صَبَاحُ الخَيْر", "בוקר טוב.", "早上好", "I 💖 emoji🏄🏾"],
+		rule: ["#/names/british/female/{/indices/{/indices/{number1}}}#"],
 		//rule: ["[/names/british/female]", "#/names/british/female/3#"],
 		//rule: ["#animalName.replace([vowel],'X')#"],
 		//rule: ["['#x# + 1' for foo in number1]"],
@@ -33,7 +34,7 @@ function testTracery() {
 	function testParsing(type, parseFxn, grammar, worldObject, viewHolder, expand) {
 		console.log("Testing " + type);
 
-	
+
 		for (var i = 0; i < tests[type].length; i++) {
 			var test = tests[type][i];
 			console.log("----------------------");
@@ -59,18 +60,18 @@ function testTracery() {
 			createDiagram(node, div);
 			console.log(node);
 
-			
-							var html = $("<div/>", {
 
-								html: node.finished
-							}).appendTo($("#panel-preview .panel-content"));
+			var html = $("<div/>", {
+
+				html: node.finished
+			}).appendTo($("#panel-preview .panel-content"));
 
 
-							var html = $("<div/>", {
-								class: "large",
-								text: node.raw
-							}).appendTo($("#panel-rule .panel-content"));
-		
+			var html = $("<div/>", {
+				class: "large",
+				text: node.raw
+			}).appendTo($("#panel-rule .panel-content"));
+
 		}
 	};
 
@@ -79,6 +80,7 @@ function testTracery() {
 		foo: {
 			bar: "WORLD_FOO",
 		},
+		indices: [3, 2, 1, 0],
 		count: {
 			value: "**I'm a path!**"
 		},
@@ -109,6 +111,7 @@ function testTracery() {
 
 
 	var grammar = tracery.createGrammar({
+
 		origin: "['#drawFlower#' for x in number1 for y in number1]",
 		drawFlower: ["<translate x=[#x# * 10 + 5] y=[#y# * 10 + 5]>"],
 		foo: ["FOO", "F00"],
@@ -153,46 +156,6 @@ function testTracery() {
 			}
 			return "LOTS_A_FOO";
 		},
-
-		random: function(a, b) {
-
-			if (b !== undefined)
-				return Math.random() * (parseFloat(b) - parseFloat(a)) + parseFloat(a);
-			if (a !== undefined)
-				return Math.random() * parseFloat(a);
-
-			return Math.random();
-		},
-
-
-		randomInt: function(a, b) {
-
-			if (b !== undefined)
-				return Math.floor(Math.random() * (parseFloat(b) - parseFloat(a)) + parseFloat(a));
-			if (a !== undefined)
-				return Math.floor(Math.random() * parseFloat(a));
-
-			return Math.round(Math.random());
-		},
-
-		range: function(min, max, steps) {
-			var s = [];
-
-			if (steps === 1)
-				return [(min + max) / 2]
-
-			for (var i = 0; i < steps; i++) {
-				s.push(i * (max - min) / (steps - 1));
-			}
-
-			return s;
-		},
-
-
-		lerp: function(min, max, a) {
-			return min + (max - min)*a;
-		},
-
 
 
 		// for each letter in s, replace with
@@ -278,7 +241,7 @@ function testTracery() {
 	var displayHolder = $("#panel-expansion .panel-content");
 
 	//tracery.testParsing("action", parseAction, grammar, worldObject, displayHolder, true);
-testParsing("rule", parseRule, grammar, worldObject, displayHolder, true);
+	testParsing("rule", parseRule, grammar, worldObject, displayHolder, true);
 	//tracery.testParsing("expression", parseExpression, grammar, worldObject, displayHolder, true);
 	//tracery.testParsing("address", parseAddress, grammar, worldObject, displayHolder, true);
 

@@ -386,18 +386,18 @@ var progressLevels = {
 
 var hoursInADay = 10;
 
-var updatesPerTick = 60;
+var updatesPerTick = 1;
 
 var insightPerProgress = .01;
 var insightRamp = 1.5;
 var gameRate = 400;
 
 var tuning = {
-	chilling: 1,
-	researching: 1,
-	writing: 1,
-	studying: .6,
-	brainstorming: 19,
-	stress: 2,
+	chilling: 20,
+	researching: 10,
+	writing: 10,
+	studying: 12,
+	brainstorming: 3,
+	stress: 10,
 }
 console.log(skillsByKey);

@@ -70,6 +70,7 @@ var tracery = (function() {
 
 
 	TraceryGrammar.prototype.pushRules = function(key, rules, state) {
+		//console.log(rules);
 		if (!state.stacks[key])
 			state.stacks[key] = [];
 		state.stacks[key].push(new TraceryRuleset(key, rules));
@@ -239,6 +240,7 @@ var tracery = (function() {
 									});
 
 									// Create the parameter values for this function
+
 									var passCondition = grammar.functions[key].call(rule, parameters);
 									if (!passCondition)
 										accepted = false;
@@ -578,17 +580,22 @@ var tracery = (function() {
 								fxn = grammar.modifiers[mod.key];
 								name = mod.key;
 							}
+
+							// Append an error signal if unfinished
 							if (fxn === undefined) {
 								node.errors.push("No modifier " + inQuotes(name));
-								mod.finished += "[[." + name + "]]";
+								node.finished += "[[." + name + "]]";
 
 							} else {
 								if (mod.parameters === undefined)
 									mod.parameters = [];
+
+								// get the finished value of each parameter
 								var parameters = mod.parameters.map(function(p) {
-									console.log(p);
 									return p.finished;
 								});
+
+								// Apply the mod, with any parameters
 								node.finished = fxn.apply(undefined, [node.finished].concat(parameters));
 							}
 						}
@@ -783,6 +790,51 @@ var tracery = (function() {
 		createGrammar: function(raw, useBaseModifiers) {
 			var grammar = new TraceryGrammar(raw);
 
+			// Basic function
+			grammar.functions = {
+
+				random: function(a, b) {
+
+					if (b !== undefined)
+						return Math.random() * (parseFloat(b) - parseFloat(a)) + parseFloat(a);
+					if (a !== undefined)
+						return Math.random() * parseFloat(a);
+
+					return Math.random();
+				},
+
+
+				randomInt: function(a, b) {
+
+					if (b !== undefined)
+						return Math.floor(Math.random() * (parseFloat(b) - parseFloat(a)) + parseFloat(a));
+					if (a !== undefined)
+						return Math.floor(Math.random() * parseFloat(a));
+
+					return Math.round(Math.random());
+				},
+
+				range: function(min, max, steps) {
+					var s = [];
+					if (!steps)
+						steps = max - min;
+
+					if (steps === 1)
+						return [(min + max) / 2]
+
+					for (var i = 0; i < steps; i++) {
+						s.push(i * (max - min) / (steps - 1));
+					}
+
+					return s;
+				},
+
+
+				lerp: function(min, max, a) {
+					return min + (max - min) * a;
+				},
+
+			}
 			if (useBaseModifiers) {
 
 				function isVowel(c) {
@@ -966,7 +1018,7 @@ var tracery = (function() {
 
 
 			if (i < path.length - 1) {
-				if (!obj2[next]) {
+				if (obj2[next] === undefined) {
 					console.warn("No address " + inQuotes(next) + " found in path " + inSquareBrackets(path));
 					return undefined;
 				}
@@ -975,7 +1027,7 @@ var tracery = (function() {
 			}
 		}
 
-		if (!obj2[next]) {
+		if (obj2[next] === undefined) {
 			console.warn("No address " + inQuotes(next) + " found in path " + inSquareBrackets(path));
 			return undefined;
 		}

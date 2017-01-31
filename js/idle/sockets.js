@@ -25,7 +25,7 @@ var Socket = Class.extend({
 			class: "socket socket-" + settings.label,
 			id: "socket-" + settings.label + "-" + obj.key
 		}).appendTo(this.holder).droppable({
-
+			tolerance: "touch",
 			activeClass: "droppable-active",
 			hoverClass: "droppable-hover",
 
@@ -108,6 +108,24 @@ var Meeple = Class.extend({
 		this.moveTo();
 	},
 
+
+	jump: function(amt) {
+		var meeple = this;
+		if (!amt)
+			amt = 1;
+		meeple.div.css({
+			transform: "translate(0px, " + -amt*5 + "px)"
+		});
+		setTimeout(function() {
+			meeple.div.css({
+				transform: "translate(0px, 0px)"
+			});
+			//	meeple.div.removeClass("jump");
+
+		}, 100);
+	},
+
+
 	remove: function() {
 		this.currentLocation = undefined;
 		this.currentLocationLabel = undefined;
@@ -126,11 +144,11 @@ var Meeple = Class.extend({
 
 		this.currentLocation = target;
 		this.currentLocationLabel = label;
-	
-	if (target.sockets[label])
-		target.sockets[label].div.append(this.div);
-else 
-	console.warn("No socket " + target + " " + label);
+
+		if (target.sockets[label])
+			target.sockets[label].div.append(this.div);
+		else
+			console.warn("No socket " + target + " " + label);
 		this.obj.setActivity(label, target);
 
 	},

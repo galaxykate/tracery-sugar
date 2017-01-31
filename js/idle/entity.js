@@ -29,16 +29,19 @@ var Entity = Class.extend({
 
 
 		}
+		if (this.meeple)
+			this.meeple.jump();
+
 	},
 
 
 	update: function(increment) {
-		
+
 		// get the current level
 		var lvls = progressLevels[this.type];
 		if (lvls && lvls[this.level + 1] !== undefined) {
 			var nextLevel = lvls[this.level + 1];
-		
+
 			var limit = nextLevel.limit;
 			if (this.size)
 				limit *= this.size;

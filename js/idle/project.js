@@ -1,7 +1,7 @@
 var projectCount = 0;
 
 var Project = Entity.extend({
-	init: function(idea) {
+	init: function(idea, json) {
 		this.idea = idea;
 		this.type = "project";
 		this.id = projectCount++;
@@ -10,18 +10,24 @@ var Project = Entity.extend({
 		this.hue = idea.hue;
 		this.sockets = {};
 		this.createView();
-		this.reroll();
+
+
+		if (json)
+			loadFromJSON(json)
+		else
+			this.reroll();
+
 
 		this.papers = [];
 
-		
+
 		for (var i = 0; i < 0; i++) {
-			var paper = this.createPaper(getRandom(paperTypes), Math.floor(Math.random()*3));
+			var paper = this.createPaper(getRandom(paperTypes), Math.floor(Math.random() * 3), 0);
 		}
 	},
 
 	onAddProgress: function(amt, source) {
-		console.log("research progress " + source, amt);
+
 		this.insights += .01 * amt * (Math.pow(this.progess / this.size), 2);
 	},
 
@@ -33,7 +39,7 @@ var Project = Entity.extend({
 
 	complete: function() {
 		lab.removeMeeplesAt(this);
-		this.sockets.research.remove();	
+		this.sockets.research.remove();
 	},
 
 
@@ -55,7 +61,7 @@ var Project = Entity.extend({
 			} else {
 				project.set[type] = getRandom(skills[type]);
 			}
-		
+
 		})
 
 
@@ -71,7 +77,8 @@ var Project = Entity.extend({
 	},
 
 	createPaper: function(type, quality, cost) {
-		
+		console.log("create paper " + type + " " + quality + " " + cost);
+
 		var paper = new Paper(this, type, quality);
 		this.papers.push(paper);
 		lab.papers.push(paper);

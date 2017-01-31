@@ -67,17 +67,38 @@ $(document).ready(function() {
 	$("#overlay").hide();
 
 	lab = new Lab();
+	//lab.loadFromJSON(localStorage.getItem("revisionsSave"));
 
-
+var count = 0;
 	// Update loop
 	setInterval(function() {
 		if (!paused) {
 			// increment the day
 			for (var i = 0; i < updatesPerTick; i++) {
-				lab.update(1/hoursInADay);
+				lab.update(1 / hoursInADay);
 			}
 		}
+		count++;
+
+		if (count %5 === 0) {
+			/*
+			var json = lab.toJSON();
+			console.log("save " + json);
+			localStorage.setItem("revisionsSave",json );
+			*/
+		}
 	}, gameRate);
+
+	popup(function(div) {
+		div.append("<div class='game-title'>Revisions</div>");
+		div.append("<div class='instruction'>Place your researchers in <b>Brainstorm</b> slot to generate new ideas</div>");
+		div.append("<div class='instruction'>Double-click a good idea to start a project</div>");
+		div.append("<div class='instruction'>Work on projects until you have enough insights to publish</div>");
+		div.append("<div class='instruction'>Assign researchers with good writing or relevant skills to write paper</div>");
+		div.append("<div class='instruction'>When a paper is finished, drag it to a conference's slot to submit it</div>");
+		div.append("<div class='minitext'>a call for papers game for CIG 2017</div>");
+		div.append("<div class='minitext'>by @galaxykate</div>");
+	}, {});
 });
 
 $(window).keypress(function(e) {
@@ -100,13 +121,15 @@ function selectTagGroup(key) {
 
 
 function popup(fillHtml, settings) {
-
+var lastPaused = paused;
+paused = true;
 
 	var overlay = $("#overlay")
 	overlay.show();
 
 
 	function close() {
+		paused = lastPaused;
 		$("#popup-content").html("");
 		overlay.hide();
 		if (settings.onClose)

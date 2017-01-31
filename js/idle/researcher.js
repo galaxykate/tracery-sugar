@@ -1,7 +1,7 @@
 var researcherCount = 0;
 
 var Researcher = Entity.extend({
-	init: function() {
+	init: function(json) {
 
 		this.type = "researcher";
 		this.id = researcherCount++;
@@ -11,12 +11,48 @@ var Researcher = Entity.extend({
 		this.sockets = {};
 		this.skills = {};
 		this.createView();
-		this.reroll();
+
+		if (json)
+			this.loadFromJSON(json);
+		else {
+			this.reroll();
+		}
 
 
 
 		this.announce(" has joined the lab");
 
+	},
+
+	loadFromJSON: function(json) {
+		var researcher = this;
+		var values = ["progress", "timeInDept", "name", "hue", "flavor", "studyProgress", "level", "stress"];
+		values.forEach(key => this[key] = json[key]);
+
+		if (json.skills)
+			$.each(json.skills, function(key, val) {
+				researcher.skills[key] = {
+					level: val,
+					tag: skillsByKey[key]
+				}
+			});
+
+		this.refreshView();
+		this.updateSkillView();
+	},
+
+	toJSON: function() {
+		var values = ["progress", "timeInDept", "name", "hue", "flavor", "studyProgress", "level", "stress"];
+		var json = {
+			skills: {}
+		};
+
+		$.each(this.skills, function(key, val) {
+			json.skills[key] = val.level
+		});
+
+		values.forEach(key => json[key] = this[key]);
+		return json;
 	},
 
 	remove: function() {
@@ -37,14 +73,14 @@ var Researcher = Entity.extend({
 
 	setDetails: function() {
 		this.view.tags.html("");
-
+		this.flavor = grammar.flatten("#personFlavor#");
 
 		this.studyProgress = 0;
 
 		this.stress = Math.random() * 100;
 		this.timeInDept = Math.random() * 10;
 		this.progress = 10;
-		this.progressLevel = 0;
+
 
 		this.skills = {};
 		this.name = grammar.flatten("#firstName#") + " " + grammar.flatten("#lastName#");
@@ -56,14 +92,17 @@ var Researcher = Entity.extend({
 	},
 
 	update: function(increment) {
+
 		this._super(increment);
 
 		this.timeInDept += increment;
 
+
+
 		// self preservation
 
-		if (this.stress > (60 + 20 * Math.random()) && Math.random() > .9) {
-
+		if (this.meeple.currentLocationLabel !== "home" && this.stress > (70 + 20 * Math.random()) && Math.random() > .9) {
+			this.announce(" is too stressed to work and has gone home to rest");
 			this.reset();
 		}
 
@@ -77,12 +116,13 @@ var Researcher = Entity.extend({
 			if (neighbors[i].skills.leadership && this !== neighbors[i])
 				leaderBonus += neighbors[i].skills.leadership.level;
 		}
-		
+
 		if (this.meeple.currentLocationLabel !== "home") {
 			this.stress += tuning.stress * increment;
 
 			if (this.stress > 100) {
 				this.announce(" has dropped out of the department from stress");
+
 				this.remove();
 			}
 		}
@@ -94,11 +134,16 @@ var Researcher = Entity.extend({
 			this.remove();
 		}
 
+
+
 		switch (this.meeple.currentLocationLabel) {
 			case "home":
 				if (this.skills.chilling)
 					bonus += this.skills.chilling.level;
 				this.stress = Math.max(0, this.stress - bonus * increment * tuning.chilling);
+
+
+
 				break;
 
 			case "study":
@@ -112,6 +157,8 @@ var Researcher = Entity.extend({
 				if (this.studyProgress > 15) {
 					this.studyProgress = 0;
 					this.gainSkill(true);
+					this.meeple.jump(1.5);
+
 
 				}
 				break;
@@ -141,6 +188,8 @@ var Researcher = Entity.extend({
 					// Come up with new idea
 					var allTags = [].concat.apply([], neighbors.map(s => s.getAllTags(true)));
 					lab.ideas.push(new Idea(allTags));
+					this.meeple.jump(1.5);
+
 
 				}
 				break;
@@ -156,13 +205,17 @@ var Researcher = Entity.extend({
 				break;
 		}
 
-
+		var rate = 12 / Math.min(bonus, 4);
+		if (lab.tick % rate === this.id % rate)
+			this.meeple.jump(.5 + .1 * bonus);
 
 		this.stressView.update(this.stress);
 		this.timeView.update(this.timeInDept);
 		this.progressView.update(this.progress);
 
 	},
+
+
 
 	getAllTags: function(ignoreMeta) {
 		var tags = [];
@@ -267,7 +320,7 @@ var Researcher = Entity.extend({
 
 		this.view.details = $("<div/>", {
 			class: "details",
-			html: grammar.flatten("#personFlavor#")
+
 		}).appendTo(this.view.bottom);
 
 		this.view.life = $("<div/>", {
@@ -296,6 +349,7 @@ var Researcher = Entity.extend({
 	refreshView: function() {
 
 		this.view.name.html(this.name);
+		this.view.details.html(this.flavor);
 	},
 
 	toString: function() {

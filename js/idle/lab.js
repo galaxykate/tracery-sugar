@@ -19,6 +19,7 @@ var Lab = Entity.extend({
 		for (var i = 0; i < 5; i++) {
 			this.update();
 		}
+		this.tick = 0;
 
 	},
 
@@ -53,24 +54,8 @@ var Lab = Entity.extend({
 	},
 
 	setDetails: function() {
-		
-		$("#announcements").html("");
-		$("#people").html("");
-		$("#projects .content").html("");
-		$("#whiteboard .content").html("");
-		$("#calendar .content").html("");
-		$(".meeple").remove();
 
-
-console.log("reroll " + this);
-
-		this.papers = [];
-		this.people = [];
-		this.ideas = [];
-		this.projects = [];
-		this.publications = [];
-
-		this.view.name.html(this.name);
+		this.removeAll();
 
 		this.announce("A CFP game for <a href='http://www.cig2017.com/'>Computational Intelligence in Games", true);
 		this.announce("Deadlines:", true);
@@ -79,17 +64,82 @@ console.log("reroll " + this);
 		this.announce("Competition papers, vision papers and poster papers: <b>May 15</b>", true);
 
 		this.name = grammar.flatten("#labName#");
-		this.view.name.html(this.name);
+
 		this.brainstormProgress = 90;
 		this.morale = 50;
 		this.prestige = 1;
 		this.day = 1;
+		for (var i = 0; i < 0; i++) {
+			this.ideas.push(new Idea());
+			this.projects.push(new Project(this.ideas[i]));
 
-	
+		}
+
+	},
+
+
+	toJSON: function() {
+		var json = {
+			prestige: this.prestige,
+			day: this.day,
+			name: this.name,
+			people: this.people.map(p => p.toJSON()),
+			ideas: this.ideas.map(p => p.toJSON()),
+			projects: this.projects.map(p => p.toJSON()),
+			papers: this.papers.map(p => p.toJSON()),
+		publications: this.publications.map(p => p.toJSON())
+		}
+		console.log(json);
+		return JSON.stringify(json);
+	},
+
+	loadFromJSON: function(s) {
+		var lab = this;
+		console.log("load " + s);
+		if (s !== undefined && s !== null && s !== "undefined") {
+			this.removeAll();
+
+			var json = JSON.parse(s);
+			console.log(json);
+
+			["name", "prestige", "day"].forEach(key => this[key] = json[key]);
+			console.log(this);
+
+			// clear current
+
+			if (json.people)
+				this.people = json.people.map(json => new Researcher(json));
+			if (json.ideas)
+				this.ideas = json.ideas.map(json => new Idea(undefined, json));
+			if (json.projects)
+				this.projects = json.projects.map(json => new Project(undefined, json));
+
+			this.refreshView();
+
+		}
+
+	},
+
+	removeAll: function() {
+		$("#announcements").html("");
+		$("#people").html("");
+		$("#projects .content").html("");
+		$("#whiteboard .content").html("");
+		$("#calendar .content").html("");
+		$(".meeple").remove();
+
+
+		console.log("reroll " + this);
+
+		this.papers = [];
+		this.people = [];
+		this.ideas = [];
+		this.projects = [];
+		this.publications = [];
 	},
 
 	update: function() {
-
+		this.tick++;
 
 
 		var increment = 1 / hoursInADay;
@@ -119,7 +169,7 @@ console.log("reroll " + this);
 
 
 		if (this.publications.length < 5) {
-			this.publications.push(new Publication(this.day + 90 + Math.random()*10));
+			this.publications.push(new Publication(this.day + 90 + Math.random() * 10));
 		}
 
 
@@ -128,7 +178,8 @@ console.log("reroll " + this);
 		//		this.moraleView.update(this.morale);
 		this.prestigeView.update(this.prestige);
 
-		this.automove();
+		if (lab.useAutomove)
+			this.automove();
 		this.publications = this.publications.filter(s => !s.isDeleted);
 		this.projects = this.projects.filter(s => !s.isDeleted);
 		this.papers = this.papers.filter(s => !s.isDeleted);
@@ -199,7 +250,7 @@ console.log("reroll " + this);
 
 
 	createView: function() {
-		
+
 		this.view = createViewDiv($("#lab-data"), "researcher", this, true);
 
 		this.view.name = $("<div/>", {
@@ -272,6 +323,9 @@ console.log("reroll " + this);
 
 	},
 	refreshView: function() {
+		this.view.name.html(this.name);
 
+		this.dayView.update(this.day);
+		this.prestigeView.update(this.prestige);
 	}
 });

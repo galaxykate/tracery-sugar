@@ -1,7 +1,7 @@
 var paperCount = 0;
 
 var Paper = Entity.extend({
-	init: function(project, type, quality) {
+	init: function(project, type, quality, json) {
 
 		this.type = "paper";
 		this.paperType = type;
@@ -17,6 +17,28 @@ var Paper = Entity.extend({
 
 	},
 
+	loadFromJSON: function(json) {
+		var values = ["hue", "name"];
+		values.forEach(key => this[key] = json[key]);
+
+		if (json.tags)
+			this.tags = json.tags.map(key => skillsByKey[key]);
+
+		this.refreshView();
+		this.updateSkillView();
+	},
+
+	toJSON: function() {
+		var values = ["progress", "timeInDept", "name", "hue", "flavor", "studyProgress", "level", "stress"];
+		var json = {
+			tags: this.map(tag => tag.key)
+		};
+		values.forEach(key => json[key] = this[key]);
+
+		return json;
+	},
+
+
 	setDetails: function() {
 		this.citations = 0;
 		this.isPublished = false;
@@ -29,6 +51,7 @@ var Paper = Entity.extend({
 		this.tags = this.getTagObjects(node.tags);
 
 		this.size = this.paperType.length;
+	
 
 	},
 
@@ -169,7 +192,11 @@ var Paper = Entity.extend({
 		this.progressBar = new ProgressBar(this.view.progressHolder, "progress", this.size);
 
 		this.view.name.html(this.name);
-		this.view.type.html(this.paperType);
+		
+
+			this.view.quality.html(qualityToText[this.quality]);
+		this.view.type.html(this.paperType.name + "");
+
 		this.updateTagView();
 	},
 

@@ -1,7 +1,7 @@
 var publicationCount = 0;
 
 var Publication = Entity.extend({
-	init: function(day) {
+	init: function(day, json) {
 
 		this.type = "publication";
 		this.id = paperCount++;
@@ -20,6 +20,27 @@ var Publication = Entity.extend({
 
 	},
 
+	loadFromJSON: function(json) {
+		var values = ["hue", "name", "day"];
+		values.forEach(key => this[key] = json[key]);
+
+		if (json.tags)
+			this.tags = json.tags.map(key => skillsByKey[key]);
+
+		this.refreshView();
+		this.updateSkillView();
+	},
+
+	toJSON: function() {
+		var values = ["hue", "name", "day"];
+		var json = {
+			tags: this.map(tag => tag.key)
+		};
+		values.forEach(key => json[key] = this[key]);
+
+		return json;
+	},
+
 	setDetails: function() {
 
 		this.mode = "deadline";
@@ -31,8 +52,9 @@ var Publication = Entity.extend({
 		this.nickname = createAcronym(this.name);
 		this.tags = this.getTagObjects(node.tags);
 
-		this.tags.push(getRandom(skills.approach));
-		this.tags.push(getRandom(skills.misc));
+
+		this.tags.push(getRandom(skills.nonMeta));
+		this.tags.push(getRandom(skills.nonMeta));
 		this.tags.push(getRandom(skills.nonMeta));
 	},
 
@@ -110,7 +132,7 @@ var Publication = Entity.extend({
 						if (reviews.score > 0) {
 							papers[i].announce(" <b>ACCEPTED</b> to " + this.name);
 							papers[i].publish(this);
-						
+
 						} else {
 							papers[i].announce(" <b>REJECTED</b> from " + this.name);
 						}

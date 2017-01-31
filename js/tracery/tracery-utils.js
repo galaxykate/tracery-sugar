@@ -7,13 +7,13 @@
 
 //http://jsfromhell.com/array/shuffle
 function shuffle(a) {
-    var j, x, i;
-    for (i = a.length; i; i--) {
-        j = Math.floor(Math.random() * i);
-        x = a[i - 1];
-        a[i - 1] = a[j];
-        a[j] = x;
-    }
+	var j, x, i;
+	for (i = a.length; i; i--) {
+		j = Math.floor(Math.random() * i);
+		x = a[i - 1];
+		a[i - 1] = a[j];
+		a[j] = x;
+	}
 }
 
 function toCamelCase(str) {
@@ -224,8 +224,9 @@ function parseAddress(s, context) {
 			var s2 = sections[i];
 			switch (s2.openChar) {
 				case "{":
+					console.log("dynamic section", s2.inner);
 					parsed.isDynamic = true;
-					keySections.push(parseRule(s2.inner, true));
+					keySections.push(parseTag(s2.inner, true));
 					if (parsed.isFunction) {
 						errors.push("Text after function parenthesis:" + inQuotes(s));
 					}
@@ -487,7 +488,7 @@ function parseRule(rawRule, protected) {
 	};
 
 
-	
+
 	// Non-string rule!
 	if (!isString(rawRule)) {
 		//console.warn("non-string rule");
@@ -500,8 +501,8 @@ function parseRule(rawRule, protected) {
 	if (protected)
 		baseLevelIgnore = "";
 
-	var openChars = "[#";
-	var closeChars = "]#";
+	var openChars = "[{#";
+	var closeChars = "]}#";
 	if (protected) {
 		openChars = "[{(#";
 		closeChars = "]})#";

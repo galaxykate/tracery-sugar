@@ -1,25 +1,54 @@
 var ideaCount = 0;
 
 var Idea = Entity.extend({
-	init: function(sourceTags) {
+	init: function(sourceTags, json) {
 
 		this.type = "idea";
 		this.id = projectCount++;
 		this.key = this.type + this.id;
+
+		if (!sourceTags)
+			sourceTags = [];
+
 		this.sourceTags = sourceTags;
 		this.hue = Math.random() * 360;
 		this.createView();
-		this.reroll();
 
+		if (json)
+			loadFromJSON(json)
+		else
+			this.reroll();
 
 	},
+
+	loadFromJSON: function(json) {
+		var values = ["hue", "name"];
+		values.forEach(key => this[key] = json[key]);
+
+		if (json.tags)
+			this.tags = json.tags.map(key => skillsByKey[key]);
+
+		this.refreshView();
+		this.updateSkillView();
+	},
+
+	toJSON: function() {
+		var values = ["progress", "timeInDept", "name", "hue", "flavor", "studyProgress", "level", "stress"];
+		var json = {
+			tags: this.map(tag => tag.key)
+		};
+		values.forEach(key => json[key] = this[key]);
+
+		return json;
+	},
+
 
 	upgradeToProject: function() {
 		this.view.css({
 			"text-decoration": "underline",
 			pointerEvents: "none",
 			border: "2px solid hsl(" + this.hue + ",50%, 50%)",
-border: "2px solid hsl(" + this.hue + ",50%, 50%)",
+			border: "2px solid hsl(" + this.hue + ",50%, 50%)",
 
 		});
 
@@ -31,7 +60,7 @@ border: "2px solid hsl(" + this.hue + ",50%, 50%)",
 	},
 
 	setDetails: function() {
-		
+
 		var sourceSet = {};
 
 		for (var i = 0; i < types.length; i++) {
@@ -39,7 +68,7 @@ border: "2px solid hsl(" + this.hue + ",50%, 50%)",
 			var tags = this.sourceTags.filter(s => s.type === type);
 			sourceSet[type] = [getRandom(skills[type])].concat(tags).concat(tags);
 		}
-	
+
 		this.set = {
 			focus: getRandom(sourceSet.focus),
 			approach: getRandom(sourceSet.approach),
@@ -47,12 +76,12 @@ border: "2px solid hsl(" + this.hue + ",50%, 50%)",
 		};
 
 		this.getTagsFromSet();
-		
+
 		this.name = generateWithOverrides("idea", undefined, {
 			a: this.tags[0].name,
 			b: this.tags[1].name
 		}).finished;
-		
+
 
 	},
 
