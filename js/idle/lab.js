@@ -178,7 +178,7 @@ var Lab = Entity.extend({
 		//		this.moraleView.update(this.morale);
 		this.prestigeView.update(this.prestige);
 
-		if (lab.useAutomove)
+		//if (lab.useAutomove)
 			this.automove();
 		this.publications = this.publications.filter(s => !s.isDeleted);
 		this.projects = this.projects.filter(s => !s.isDeleted);
@@ -196,28 +196,38 @@ var Lab = Entity.extend({
 
 
 			// Make a move, maybe
-			if (Math.random() > .8 && p.stress < 50 && p.meeple.currentLocationLabel === "home") {
+			if (Math.random() > .96 && p.stress < 50 && p.meeple.currentLocationLabel === "home") {
 
 
 				// work on a random paper
 				var paper = getRandom(this.papers);
-				if (paper && Math.random() > .5)
+				if (paper && Math.random() > .5) {
+					p.announce(" decided to start working on " + toSpan(paper));
 					p.meeple.moveTo(paper, "write");
+				}
 
 
 				var project = getRandom(this.projects);
-				if (project && Math.random() > .5)
+				if (project && Math.random() > .5) {
+						p.announce(" decided to start working on " + toSpan(project));
+				
 					p.meeple.moveTo(project, "research");
+				}
 				else {
-					if (Math.random() > .5 && lab.ideas.length < 5)
+					if (Math.random() > .5 && lab.ideas.length < 5) {
+						p.announce(" has started brainstorming");
 						p.meeple.moveTo(lab, "brainstorm");
-					else
+					}
+					else {
+						p.announce(" decided to spend time studying");
 						p.meeple.moveTo(lab, "study");
+					}
 				}
 
 
 			}
 		}
+		/*
 		for (var i = 0; i < this.papers.length; i++) {
 
 
@@ -244,7 +254,7 @@ var Lab = Entity.extend({
 
 
 		}
-
+*/
 
 	},
 

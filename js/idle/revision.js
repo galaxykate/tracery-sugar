@@ -96,7 +96,7 @@ var count = 0;
 		div.append("<div class='instruction'>Work on projects until you have enough insights to publish</div>");
 		div.append("<div class='instruction'>Assign researchers with good writing or relevant skills to write paper</div>");
 		div.append("<div class='instruction'>When a paper is finished, drag it to a conference's slot to submit it</div>");
-		div.append("<div class='minitext'>a call for papers game for CIG 2017</div>");
+		div.append("<div class='minitext'>a call for papers game for <a href='http://www.cig2017.com/call-for-papers/' target='_blank'> CIG 2017</a></div>");
 		div.append("<div class='minitext'>by @galaxykate</div>");
 	}, {});
 });

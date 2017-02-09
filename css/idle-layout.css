@@ -1,4 +1,6 @@
-
+a {
+  pointer-events: all;
+}
 
 html{
   height: 100%;

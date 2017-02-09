@@ -25,9 +25,15 @@ var tracery = (function() {
 
 		for (var key in rawSymbols) {
 			if (rawSymbols.hasOwnProperty(key)) {
-				this.symbols[key] = new TraceryRuleset(key, rawSymbols[key]);
+
+				// Wrap in an array if neccessary
+				if (!Array.isArray(rawSymbols[key]))
+					this.symbols[key] = [rawSymbols[key]];
+				else
+					this.symbols[key] = rawSymbols[key].slice(0);
 			}
 		}
+
 	};
 
 	TraceryGrammar.prototype.addModifiers = function(mods) {
@@ -43,10 +49,11 @@ var tracery = (function() {
 		if (isModifier)
 			return this.modifiers[key];
 
-
 		if (this.functions[key] !== undefined)
 			return this.functions[key];
 
+
+		// Return a wrapped version of the math fxn
 		if (Math[key] !== undefined) {
 
 			return function() {
@@ -59,8 +66,10 @@ var tracery = (function() {
 
 	};
 
+
+
 	TraceryGrammar.prototype.setSymbol = function(key, rules) {
-		this.symbols[key] = new TraceryRuleset(key, rules);
+		this.symbols[key] = rules;
 	}
 
 	TraceryGrammar.prototype.getActiveRuleset = function(key, node, state) {
@@ -73,16 +82,21 @@ var tracery = (function() {
 
 
 	TraceryGrammar.prototype.pushRules = function(key, rules, state) {
+
+		if (!Array.isArray(rules))
+			rules = [rules];
+
 		if (!state.stacks[key])
 			state.stacks[key] = [];
 
-		var ruleset = new TraceryRuleset(key, rules);
-		state.stacks[key].push(ruleset);
+
+		state.stacks[key].push(rules);
+
 	};
 
 	// Stomp rules
 	TraceryGrammar.prototype.setRules = function(key, rules, state) {
-		state.stacks[key] = [new TraceryRuleset(key, rules)];
+		state.stacks[key] = rules;
 
 	};
 
@@ -95,6 +109,26 @@ var tracery = (function() {
 
 	TraceryGrammar.prototype.clearRules = function(key, state) {
 		state.stacks[key] = [];
+	};
+
+
+	TraceryGrammar.prototype.getRule = function(rules, node, state) {
+
+		// todo, shuffling
+
+		if (!Array.isArray(rules))
+			console.warn("non-array rules: " + rules);
+		var index = Math.floor(Math.random() * rules.length);
+
+		// Cache parsing of string rules
+		// Replace the plaintext rule with a parsed version
+		if (isString(rules[index])) {
+			rules[index] = parseRule(rules[index]);
+		}
+
+		//console.log(rules, index, rules[index]);
+
+		return rules[index];
 	};
 
 	TraceryGrammar.prototype.expand = function(rule, parent, state, isProtected) {
@@ -134,8 +168,9 @@ var tracery = (function() {
 	TraceryGrammar.prototype.expandNode = function(node, parent, state) {
 		nodeExpansions++;
 		var grammar = this;
-		if (node === undefined)
+		if (node === undefined) {
 			throw ("empty node");
+		}
 		if (state === undefined) {
 			state = {};
 		}
@@ -150,6 +185,13 @@ var tracery = (function() {
 			node.depth = parent.depth + 1;
 		}
 
+		// wrap number
+		if (!isNaN(node)) {
+			node = {
+				type: "number",
+				finished: node
+			};
+		}
 		switch (node.type) {
 
 			case "number":
@@ -157,15 +199,23 @@ var tracery = (function() {
 
 
 			case "expression":
-
 				switch (node.expressionType) {
 					case "operator":
+						var lhs, rhs;
 						grammar.expandNode(node.operator, node, state);
-						grammar.expandNode(node.lhs, node, state);
 						grammar.expandNode(node.rhs, node, state);
-						var lhs = parseFloat(node.lhs.finished);
-						var rhs = parseFloat(node.rhs.finished);
+						if (node.lhs !== undefined) {
+							grammar.expandNode(node.lhs, node, state);
+							lhs = parseFloat(node.lhs.finished);
+						}
+						rhs = parseFloat(node.rhs.finished);
 						switch (node.operator.finished) {
+							case "!":
+								node.finished = !rhs;
+								break;
+							case "NEG":
+								node.finished = -rhs;
+								break;
 							case "+":
 								node.finished = lhs + rhs;
 								break;
@@ -263,7 +313,6 @@ var tracery = (function() {
 
 
 						var generatedRules = [];
-
 						// Expand all the rules of the for loops
 						for (var i = 0; i < node.loops.length; i++) {
 
@@ -279,9 +328,13 @@ var tracery = (function() {
 						function makeTemplates(loopIndex) {
 							var loop = node.loops[loopIndex];
 
-							// All the rules to iterate through
-							var rules = loop.source.generatedRules;
-							
+							// All the rules to iterate through (may be finished, or generated rules, 
+							// language inconsistency TODO)
+							var rules = loop.source.finished;
+
+							if (loop.source.finished !== undefined)
+								rules = loop.source.finished;
+
 							// For each possible rule, generate expansions with the other loops' values
 							for (var i = 0; i < rules.length; i++) {
 								var key = loop.key.key;
@@ -295,8 +348,10 @@ var tracery = (function() {
 								// Otherwise, generate the rules
 								else {
 
+
 									// We're going to be filling a template, with some values
 									grammar.expandNode(node.templateExpression, node, state);
+
 									generatedRules.push(node.templateExpression.finished);
 								}
 
@@ -306,8 +361,9 @@ var tracery = (function() {
 						}
 
 						makeTemplates(0);
-						node.generatedRules = generatedRules;
-						
+
+						node.finished = generatedRules;
+
 						break;
 
 						// Concatenate rule sets
@@ -315,11 +371,12 @@ var tracery = (function() {
 
 						var rulesets = node.concatenateRules.map(function(ruleGenerator) {
 							grammar.expandNode(ruleGenerator, node, state);
-							return ruleGenerator.generatedRules;
+
+							return ruleGenerator.finished;
 						});
 
 						// Merge the arrays
-						node.generatedRules = [].concat.apply([], rulesets);
+						node.finished = [].concat.apply([], rulesets);
 						break;
 
 						// Parse and generate a text rule
@@ -327,7 +384,7 @@ var tracery = (function() {
 
 
 						grammar.expandNode(node.rule, node, state);
-						node.generatedRules = [node.rule.finished];
+						node.finshed = [node.rule.finished];
 
 						break;
 
@@ -344,7 +401,7 @@ var tracery = (function() {
 							if (!target) {
 								node.errors.push("No function " + inQuotes(address.raw));
 							} else {
-								node.generatedRules = target.apply(null, address.finishedParameters);
+								node.finished = target.apply(null, address.finishedParameters);
 							}
 						} else if (address.isSymbolKey) {
 							// Clone the rules
@@ -352,12 +409,12 @@ var tracery = (function() {
 								console.warn("No rules found for " + address.key);
 							}
 							if (!target || !target.rules)
-								node.generatedRules = [];
+								node.finished = [];
 							else
-								node.generatedRules = target.rules.slice(0);
+								node.finished = target.rules.slice(0);
 						} else {
 							// Crap from world object
-							node.generatedRules = target;
+							node.finished = target;
 						}
 
 						break;
@@ -366,8 +423,6 @@ var tracery = (function() {
 						console.warn("Unknown rule generator type " + inQuotes(node.rgType));
 				}
 
-
-				node.finished = node.generatedRules;
 
 
 				break;
@@ -390,12 +445,18 @@ var tracery = (function() {
 						if (node.ruleGenerator) {
 
 							this.expandNode(node.ruleGenerator, parent, state);
+							var finishedRules = node.ruleGenerator.finished;
+							if (!isNaN(finishedRules))
+								finishedRules = {
+									type: "number",
+									finished: finishedRules
+								}
 
 							// :: set rules, : push rules
 							if (node.operator === "::")
-								grammar.setRules(key, node.ruleGenerator.finished, state);
+								grammar.setRules(key, finishedRules, state);
 							else
-								grammar.pushRules(key, node.ruleGenerator.finished, state);
+								grammar.pushRules(key, finishedRules, state);
 						} else {
 							if (node.command) {
 								switch (node.command) {
@@ -432,21 +493,25 @@ var tracery = (function() {
 					node.finishedSections = [];
 					var val = "";
 					var onlyText = true;
+					var joinable = true;
 
 					for (var i = 0; i < node.sections.length; i++) {
 						var section = node.sections[i];
 						this.expandNode(section, node, state);
 
+						if (section.containsData)
+							node.containsData = true;
+
 						switch (section.type) {
 							case "ruleGenerator":
-								if (section.generatedRules !== undefined) {
-
-									if (Array.isArray(section.generatedRules)) {
-										node.finishedSections.push(section.generatedRules.filter(function(s2) {
+								if (section.finished !== undefined) {
+									// Join an array (because commas aren't usually wanted)
+									if (Array.isArray(section.finished)) {
+										node.finishedSections.push(section.finished.filter(function(s2) {
 											return s2 !== undefined
 										}).join(""));
 									} else {
-										node.finishedSections.push(section.generatedRules);
+										node.finishedSections.push(section.finished);
 									}
 
 								}
@@ -457,6 +522,13 @@ var tracery = (function() {
 								break;
 
 							case "tag":
+								if (section.containsData) {
+									console.warn("data found in rule, preventing concatenation");
+									joinable = false;
+
+								}
+
+
 								node.finishedSections.push(section.finished);
 
 
@@ -468,6 +540,7 @@ var tracery = (function() {
 								break;
 							case "address":
 								if (section.isFunction) {
+
 									var result = section.finishedTarget.apply(null, section.finishedParameters);
 									section.finished = result;
 								}
@@ -475,10 +548,17 @@ var tracery = (function() {
 
 
 								break;
-							default:
-								//	console.warn("unknown type", section.type);
+							case "stackAction":
+								node.finishedSections.push("");
+								break;
+							case "expression":
+								// Maybe format better if numbers?
 								node.finishedSections.push(section.finished);
+								break;
+							default:
 
+								console.warn("unknown rule section type:", section.type, section.raw, node.raw);
+								node.finishedSections.push(section.finished);
 								break
 
 						}
@@ -486,14 +566,36 @@ var tracery = (function() {
 
 					}
 
-					// Do the joining thing, if a custom one
-					if (grammar.joinRuleSections !== undefined)
-						node.finished = grammar.joinRuleSections(node.finishedSections);
-					else {
-						node.finished = node.finishedSections.join("");
+					if (joinable) {
+						// Do the joining thing, if a custom one
+						if (grammar.joinRuleSections !== undefined)
+							node.finished = grammar.joinRuleSections(node.finishedSections);
+						else {
+							node.finished = node.finishedSections.join("");
+						}
 
+						// Clear escape chars
+						var escaped = false;
+
+						var c = "";
+						for (var i = 0; i < node.finished.length; i++) {
+							if (escaped) {
+								c += node.finished.charAt(i);
+								escaped = false;
+							} else {
+								if (node.finished.charAt(i) === "\\") {
+									escaped = true;
+								} else
+									c += node.finished.charAt(i);
+							}
+						}
+						node.finished = c;
+
+					} else {
+						node.finished = node.finishedSections;
 					}
 
+					// Assemble tags
 					node.tags = [];
 					for (var i = 0; i < node.sections.length; i++) {
 						var tags = node.sections[i].tags;
@@ -503,22 +605,8 @@ var tracery = (function() {
 						}
 					}
 
-					// Clear escape chars
-					var escaped = false;
 
-					var c = "";
-					for (var i = 0; i < node.finished.length; i++) {
-						if (escaped) {
-							c += node.finished.charAt(i);
-							escaped = false;
-						} else {
-							if (node.finished.charAt(i) === "\\") {
-								escaped = true;
-							} else
-								c += node.finished.charAt(i);
-						}
-					}
-					node.finished = c;
+
 				}
 
 				break;
@@ -534,18 +622,47 @@ var tracery = (function() {
 					// Get from path
 					node.innerFinished = node.address.finished;
 
+				} else if (node.address.type === "rule") {
+					this.expandNode(node.address, node, state);
+					node.innerFinished = node.address.finished;
+					console.log(node.innerFinished);
 				} else {
+
 					// Look up a rule from a symbol stack
 					var key = node.address.key;
 					if (key !== undefined) {
 						node.ruleset = this.getActiveRuleset(key, node, state);
-						if (!node.ruleset) {
+						if (node.ruleset === undefined) {
 							node.errors.push("No ruleset for " + inQuotes(key));
 						} else {
-							node.rule = node.ruleset.getRule(node);
+							node.rule = grammar.getRule(node.ruleset, node, state);
+
+							if (node.rule === undefined) {
+								console.warn("No rule for " + key, node.ruleset);
+							}
 
 							this.expandNode(node.rule, node, state);
-							node.innerFinished = node.rule.finished;
+
+							// Inner value is the selected rule, if data,
+							// or the finished expansion, if the rule was parseable text
+							if (node.rule.type === "data" || node.rule.containsData) {
+
+								if (node.rule.finished !== undefined)
+									node.innerFinished = node.rule.finished[0];
+								else
+									node.innerFinished = node.rule;
+								node.containsData = true;
+
+							} else {
+								// special case for numbers
+								if (!isNaN(node.rule)) {
+									node.innerFinished = node.rule;
+								} else {
+									node.innerFinished = node.rule.finished;
+
+								}
+							}
+
 							node.tags = node.rule.tags;
 
 						}
@@ -557,6 +674,7 @@ var tracery = (function() {
 
 				node.finished = node.innerFinished;
 
+
 				// Expand and apply the modifiers
 				for (var i = 0; i < node.modifiers.length; i++) {
 					this.expandNode(node.modifiers[i], node, state);
@@ -564,6 +682,7 @@ var tracery = (function() {
 
 				if (node.finished !== undefined) {
 					// apply modifiers
+					node.midsteps = [];
 					if (node.modifiers) {
 
 						for (var i = 0; i < node.modifiers.length; i++) {
@@ -593,6 +712,7 @@ var tracery = (function() {
 								});
 
 								// Apply the mod, with any parameters
+								node.midsteps[i] = node.finished;
 								node.finished = fxn.apply(undefined, [node.finished].concat(parameters));
 							}
 						}
@@ -600,11 +720,14 @@ var tracery = (function() {
 				} else {
 					// Do default behavior for missing rules
 					if (node.address.path !== undefined)
+
 						node.finished = "[[" + node.address.path.map(function(pathSegment) {
-							return pathSegment.key;
-						}).join("/") + "]]";
-					else
+						return pathSegment.key;
+					}).join("/") + "]]";
+					else {
+
 						node.finished = "[[" + node.address.key + "]]";
+					}
 				}
 
 				// do postactions TODO
@@ -652,7 +775,7 @@ var tracery = (function() {
 							else
 								node.finishedPath.push(node.path[i].finished);
 						}
-						
+
 						// Use a custom access function
 						if (state.worldObject.getFromPath) {
 							node.finishedTarget = state.worldObject.getFromPath(node.finishedPath);
@@ -676,7 +799,6 @@ var tracery = (function() {
 						for (var i = 0; i < node.dynamicSections.length; i++) {
 							this.expandNode(node.dynamicSections[i], node, state);
 							val += node.dynamicSections[i].finished;
-							console.log(node.dynamicSections[i]);
 						}
 						node.key = val;
 
@@ -709,6 +831,7 @@ var tracery = (function() {
 							node.finished = node.finishedTarget.apply(null, node.finishedParameters);
 						}
 					} else {
+
 						node.errors.push("No function named " + inQuotes(key));
 					}
 				} else {
@@ -717,9 +840,17 @@ var tracery = (function() {
 				}
 
 				break;
+			case "data":
+
+				break;
+
+			case "op":
+
+				break;
+
 
 			default:
-				//		console.warn("unknown node type " + inQuotes(node.type), node);
+				console.warn("unknown node type " + inQuotes(node.type), node);
 				break;
 		}
 
@@ -729,65 +860,6 @@ var tracery = (function() {
 			}
 		}
 		return node;
-	};
-
-
-
-	//==================================================================================================
-	//==================================================================================================
-	//==================================================================================================
-
-	function TraceryRuleset(key, rawRules) {
-		this.key = key;
-		this.raw = rawRules;
-
-		if (Array.isArray(rawRules)) {
-
-			this.rules = rawRules.slice(0);
-
-		} else if (rawRules !== null && typeof rawRules === 'object') {
-			// Object rules
-		} else {
-			// String?
-			this.rules = [rawRules];
-			//createTestDiagram("rule", rawRules);
-		}
-	};
-
-
-
-	TraceryRuleset.prototype.getRule = function(node) {
-		// TODO, shuffles, weights, and conditionals
-
-
-		var index = Math.floor(Math.random() * this.rules.length);
-
-		// Just a number?
-		if (!isNaN(this.rules[index])) {
-			this.rules[index] = {
-				type: "number",
-				finished: this.rules[index]
-			}
-		}
-
-		if (isString(this.rules[index])) {
-
-
-			this.rules[index] = parseRule(this.rules[index]);
-		}
-
-
-		var parsed = Object.assign({}, this.rules[index]);
-
-		parsed.ruleIndex = index;
-		parsed.options = this.rules;
-
-		return parsed;
-	};
-
-
-	TraceryRuleset.prototype.toString = function() {
-		return this.raw;
 	};
 
 
@@ -806,7 +878,6 @@ var tracery = (function() {
 			grammar.functions = {
 
 				random: function(a, b) {
-
 					if (b !== undefined)
 						return Math.random() * (parseFloat(b) - parseFloat(a)) + parseFloat(a);
 					if (a !== undefined)
@@ -827,6 +898,7 @@ var tracery = (function() {
 				},
 
 				range: function(min, max, steps) {
+
 					var s = [];
 					if (!steps)
 						steps = max - min;
@@ -836,6 +908,23 @@ var tracery = (function() {
 
 					for (var i = 0; i < steps; i++) {
 						s.push(i * (max - min) / (steps - 1));
+					}
+
+					return s;
+				},
+
+
+				rangeUn: function(min, max, steps) {
+
+					var s = [];
+					if (!steps)
+						steps = max - min;
+
+					if (steps === 1)
+						return [(min + max) / 2]
+
+					for (var i = 0; i < steps; i++) {
+						s.push(i * (max - min) / (steps));
 					}
 
 					return s;

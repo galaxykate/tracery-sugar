@@ -71,6 +71,8 @@ function parseStackAction(s, sections) {
 			var rulesProtected = rules.map(function(rule) {
 				return "'" + rule + "'";
 			});
+		
+
 			parsed.ruleGenerator = parseRuleGenerator(rulesProtected.join(","));
 		}
 	}
@@ -99,14 +101,18 @@ function parseRuleGenerator(s) {
 		raw: s,
 	};
 
+
+
 	// Concatenation
 	var sections = splitOnUnprotected(s, ",");
 	if (sections.length > 1) {
+		console.log("Concatenation", s);
 		parsed.rgType = "rg-concatenation"
 		parsed.concatenateRules = sections.map(function(s) {
 
 			// Deal with sugar? TODO
-			var s2 = parseRuleGenerator(s);
+			var s2 = parseExpression(s);
+			console.log(s2);
 			return s2;
 		});
 		return parsed;
@@ -116,6 +122,7 @@ function parseRuleGenerator(s) {
 	// Detect "for" constructors
 	var forSections = splitOnUnprotected(s, [" for "]);
 	if (forSections.length > 1) {
+
 		parsed.rgType = "rg-for";
 		parsed.templateExpression = parseExpression(forSections[0]);
 
@@ -131,26 +138,9 @@ function parseRuleGenerator(s) {
 			});
 
 		}
+		console.log("FOR", parsed);
 		return parsed;
 	}
-
-
-	// Detect filters
-	var filterSections = splitOnUnprotected(s, [" if "]);
-	if (filterSections.length > 1) {
-		parsed.rgType = "rg-filter";
-
-		parsed.source = parseRuleGenerator(filterSections[0]);
-		parsed.conditions = [];
-		for (var i = 1; i < filterSections.length; i++) {
-			var condition = parseExpression(filterSections[i]);
-			parsed.conditions.push(condition);
-		}
-		return parsed;
-
-	}
-
-
 
 	// Single rule
 	if (isInQuotes(s)) {
@@ -166,22 +156,26 @@ function parseRuleGenerator(s) {
 		return parseRuleGenerator(s.substring(1, s.length - 1));
 	}
 
-
-
 	// Square brackets
+	if (isInPipes(s)) {
+		parsed.isFunction = parsed.address.isFunction;
+		parsed.rgType = "rg-address"
+		return parsed;
+	}
+
+
+	// [foo] a rule generator for foo
+	// [foo + 5] the value of foo plus 5
+	// [|foo|]
+	// In parenthesis 
 	if (isInParentheses(s)) {
 		return parseExpression(s.substring(1, s.length - 1));
 	}
 
+	return parseExpression(s);
 
 
-	// Fallback: parse address or function
-	parsed.address = parseAddress(s);
 
-	parsed.isFunction = parsed.address.isFunction;
-	parsed.rgType = "rg-address"
-
-	return parsed;
 }
 
 
@@ -242,7 +236,7 @@ function parseAddress(s, context) {
 					keySections.push(s2.inner);
 
 					if (parsed.isFunction) {
-						errors.push("Text after function parenthesis:" + inQuotes(s));
+						parsed.errors.push("Text after function parenthesis:" + inQuotes(s));
 					}
 					break;
 			}
@@ -363,8 +357,14 @@ function parseExpression(raw) {
 				type: "op",
 			};
 
-			var lhs = raw.substring(0, splitter.index);
-			var rhs = raw.substring(splitter.index + splitter.query.length);
+
+			var lhs = raw.substring(0, splitter.index).trim();
+			var rhs = raw.substring(splitter.index + splitter.query.length).trim();
+
+
+			if (parsed.operator.finished === "-" && lhs === "") {
+				parsed.operator.finished = "NEG";
+			}
 			parsed.lhs = parseExpression(lhs);
 			parsed.rhs = parseExpression(rhs);
 		}
@@ -376,12 +376,12 @@ function parseExpression(raw) {
 	} else {
 
 		// Single expression
-		var sections = splitIntoTopSections(raw, "[('\"#", {
+		var sections = splitIntoTopSections(raw, "|[('\"#", {
 			openChars: openChars,
 			closeChars: closeChars
 		});
 		if (sections.length === 0) {
-			console.warn("Empty sections");
+			//console.warn("Empty sections");
 			return undefined;
 		}
 
@@ -408,6 +408,7 @@ function parseExpression(raw) {
 				case "(":
 					return parseExpression(inner);
 
+
 				case undefined:
 					// Bare
 					var v = parseFloat(inner);
@@ -433,8 +434,6 @@ function parseExpression(raw) {
 function parseTag(s) {
 	var parsed = {
 		type: "tag",
-		preactions: [],
-		postactions: [],
 		modifiers: [],
 		errors: [],
 		raw: s,
@@ -464,8 +463,13 @@ function parseTag(s) {
 	}
 
 	var s3 = splitOnUnprotected(inner, ".");
-	// An address to either a symbol stack or a function or an object pathaddress
-	parsed.address = parseAddress(s3[0]);
+	if (isInQuotes(s3[0])) {
+		//console.log(s, s3);
+		parsed.address = parseRule(s3[0].substring(1, s3[0].length -1));
+	} else {
+		// An address to either a symbol stack or a function or an object pathaddress
+		parsed.address = parseAddress(s3[0]);
+	}
 
 	// Parse all the modifiers
 	parsed.modifiers = s3.slice(1).map(function(modifierRaw) {
@@ -480,7 +484,6 @@ function parseTag(s) {
 
 function parseRule(rawRule, protected) {
 	nodeParses++;
-
 
 	if (rawRule.search(/[#\{\(\[]/) < 0) {
 		var val = parseFloat(rawRule);
@@ -507,7 +510,7 @@ function parseRule(rawRule, protected) {
 
 	// Non-string rule!
 	if (!isString(rawRule)) {
-		//console.warn("non-string rule");
+		console.warn("non-string rule");
 		rule.nonString = true;
 		return rule;
 	}
@@ -517,11 +520,11 @@ function parseRule(rawRule, protected) {
 	if (protected)
 		baseLevelIgnore = "";
 
-	var openChars = "[{#";
-	var closeChars = "]}#";
+	var openChars = "[{#'\"";
+	var closeChars = "]}#'\"";
 	if (protected) {
-		openChars = "[{(#";
-		closeChars = "]})#";
+		openChars = "[{(#'\"";
+		closeChars = "]})#'\"";
 	}
 
 	rule.sections = splitIntoTopSections(rawRule, openChars, {
@@ -861,6 +864,10 @@ function isInSquareBrackets(s) {
 
 function isInParentheses(s) {
 	return (s.charAt(0) === "(" && s.charAt(s.length - 1) === ")")
+}
+
+function isInPipes(s) {
+	return (s.charAt(0) === "|" && s.charAt(s.length - 1) === "|")
 }
 
 

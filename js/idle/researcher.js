@@ -85,7 +85,7 @@ var Researcher = Entity.extend({
 		this.skills = {};
 		this.name = grammar.flatten("#firstName#") + " " + grammar.flatten("#lastName#");
 		this.view.name.html(this.name);
-
+this.skillCount = 0;
 		for (var i = 0; i < 5; i++) {
 			this.gainSkill();
 		}
@@ -154,7 +154,7 @@ var Researcher = Entity.extend({
 
 				this.studyProgress += bonus * increment * Math.random() * tuning.studying * leaderBonus;
 
-				if (this.studyProgress > 15) {
+				if (this.studyProgress > 15*Math.pow(1 + .1*this.skillCount, 2.5)) {
 					this.studyProgress = 0;
 					this.gainSkill(true);
 					this.meeple.jump(1.5);

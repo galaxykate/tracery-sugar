@@ -11,9 +11,22 @@ function createDiagramPlainNode(holder, value, type) {
 }
 
 
+function createCanvasImg(holder, img) {
+	var canvas = $("<canvas/>").appendTo(holder).css({
+		display: "inline-block"
+
+	}).css({
+		display: "inline-block"
+	});
+	canvas[0].width = img.width;
+	canvas[0].height = img.height;
+	var context = canvas[0].getContext('2d');
+	//	context.drawImage(img, 0, 0, 128, 128);
+	context.putImageData(img, 0, 0);
+}
 
 function createDiagram(node, holder, classes) {
-	
+
 	if (node === undefined || node === null) {
 
 		//	console.warn("No node to diagram!");
@@ -87,10 +100,10 @@ function createDiagram(node, holder, classes) {
 
 
 	var header = $("<div/>", {
-		text: "<b>" + node.type + "</b> " + node.raw,
+		text: node.raw,
 		class: "traceryparse-header",
 	}).appendTo(div);
-	header.hide();
+	//header.hide();
 
 
 
@@ -99,6 +112,18 @@ function createDiagram(node, holder, classes) {
 		//class: "traceryparse-content",
 	}).appendTo(div);
 
+	var subnodeHolder = $("<div/>", {
+		class: "traceryparse-subnodes",
+		//class: "traceryparse-content",
+	}).appendTo(content);
+
+	var baseNodes = $("<div/>", {
+		class: "traceryparse-baseNodes",
+	}).appendTo(content);
+
+	var footer = $("<div/>", {
+		class: "traceryparse-footer",
+	}).appendTo(content);
 
 	switch (node.type) {
 
@@ -181,11 +206,11 @@ function createDiagram(node, holder, classes) {
 
 
 		case "tag":
-			subNodes = node.preactions.slice(0);
+			//subNodes = node.preactions.slice(0);
 			subNodes.push(node.address);
-			//baseNodes.push(node.rule);
+			createDiagram(node.rule, baseNodes);
 			subNodes = subNodes.concat(node.modifiers);
-			subNodes = subNodes.concat(node.postactions);
+			//subNodes = subNodes.concat(node.postactions);
 
 			break;
 
@@ -265,6 +290,11 @@ function createDiagram(node, holder, classes) {
 
 			subNodes = node.path.slice(0);
 			break;
+		case "data":
+			// draw image
+
+
+			break;
 
 		default:
 			console.log("Unknown node type: " + node.type);
@@ -278,31 +308,40 @@ function createDiagram(node, holder, classes) {
 
 
 	if (subNodes.length > 0) {
-		var subnodeHolder = $("<div/>", {
-			class: "traceryparse-subnodes",
-			//class: "traceryparse-content",
-		}).appendTo(content);
+
 
 		$.each(subNodes, function(index, subnode) {
 			createDiagram(subnode, subnodeHolder);
 		});
 	}
 
+
 	// Add the finished elements to an array
 	if (Array.isArray(node.finished)) {
-		var finished = $("<div/>", {
-
-			class: "traceryparse-footer",
-		}).appendTo(content);
 
 		$.each(node.finished, function(index, subNode) {
-			createDiagram(subNode, finished);
+			createDiagram(subNode, footer);
 		});
 	} else {
-		var finished = $("<div/>", {
-			text: node.finished,
-			class: "traceryparse-footer",
-		}).appendTo(content);
+		if (node.midsteps) {
+			node.midsteps.forEach(function(step) {
+
+				if (step.type === "data") {
+					createCanvasImg(footer, step.data);
+				} else {
+					footer.append(step);
+				}
+
+			});
+
+		}
+		if (node.finished && node.finished.type === "data") {
+			createCanvasImg(footer, node.finished.data);
+		} else {
+			footer.append(node.finished);
+		}
+
+
 	}
 
 
