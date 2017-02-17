@@ -215,6 +215,18 @@ var skills = {
 var allSkills = [];
 var skillsByKey = {};
 
+
+	function toCamelCase(str) {
+
+		str = str.replace(/[.,'"-:;?]/g, "");
+		return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
+			if (+match === 0) return "";
+			return index == 0 ? match.toLowerCase() : match.toUpperCase();
+		});
+	}
+
+
+
 function addTags(list, type, retag, pluralize) {
 
 	for (var i = 0; i < list.length; i++) {
