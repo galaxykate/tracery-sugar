@@ -1702,6 +1702,11 @@ var nodeParses = 0;
 	}
 
 
+
+
+}());
+
+
 	/*=======================================================================================
 	 *
 	 * Abstract general-purpose parsing methods
@@ -2105,6 +2110,3 @@ var nodeParses = 0;
 		}
 		return tree;
 	}
-
-
-}());
