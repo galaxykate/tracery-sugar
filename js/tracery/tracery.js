@@ -217,7 +217,8 @@ var nodeParses = 0;
 
 		if (isString(node)) {
 			node = {
-				raw: node.raw,
+				finished: node,
+				raw: node,
 				type: "text"
 			}
 		}
