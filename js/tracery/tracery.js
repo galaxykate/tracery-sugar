@@ -100,7 +100,7 @@ var nodeParses = 0;
 		if (!Array.isArray(rules))
 			rules = [rules];
 
-		if (rules.filter(s => isNaN(s) || s === undefined).length > 0) {
+		if (rules.filter(s => Number.isNaN(s) || s === undefined).length > 0) {
 			console.warn("Contains bad rules: " + rules);
 		}
 
